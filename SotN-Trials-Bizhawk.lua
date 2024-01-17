@@ -23,6 +23,23 @@ local saveData = {
 deserializeToObject(settings, "config.ini")
 deserializeToObject(saveData, "config.ini")
 
+mnemonics = {
+    Up = "P1 D-Pad Up",
+    Down = "P1 D-Pad Down",
+    Left = "P1 D-Pad Left",
+    Right = "P1 D-Pad Right",
+    Attack = "P1 □",
+    Dash = "P1 △",
+    Shield = "P1 ○",
+    Jump = "P1 X",
+    Mist = "P1 L1",
+    L2 = "P1 L2",
+    Bat = "P1 R1",
+    Wolf = "P1 R2",
+    Map = "P1 Select",
+    Menu = "P1 Start"
+}
+
 local constants = {
     drawspace = {
         width = client.bufferwidth(),
@@ -139,13 +156,13 @@ local function trialMoveDisplay(moves, currentMove)
     for i = 1, #moves do
         if moves[i].skipDrawing ~= true then
 
-            local textLenght = 0
+            local textLength = 0
             local imagesCount = 0
             local separatorsCount = 0
             local backgroundColor = (i == currentMove) and constants.drawspace.moveDisplayBakgroundColorCurrent or (moves[i].completed and constants.drawspace.moveDisplayBakgroundColorCompleted or constants.drawspace.moveDisplayBakgroundColor)
 
             if moves[i].text then
-                textLenght = string.len(moves[i].text)
+                textLength = string.len(moves[i].text)
             end
         
             if moves[i].images then
@@ -156,7 +173,7 @@ local function trialMoveDisplay(moves, currentMove)
                 separatorsCount = #moves[i].separators
             end
 
-            local boxWidth = (textLenght * 8 * scaling) + (imagesCount * 20 * scaling) + (separatorsCount * 20 * scaling) + (20 * scaling)
+            local boxWidth = (textLength * 8 * scaling) + (imagesCount * 20 * scaling) + (separatorsCount * 20 * scaling) + (20 * scaling)
 
             if position + boxWidth > constants.drawspace.width then
                 row = row + 1
@@ -200,10 +217,10 @@ local function customMessageDisplay(row, message)
     local scaling = 1
     local position = constants.drawspace.centerX
     local rowheight = 30
-    local textLenght = 0
+    local textLength = 0
 
     if message then
-        textLenght = string.len(message)
+        textLength = string.len(message)
     else
         print("invalid argument 'message'")
         return
@@ -213,7 +230,7 @@ local function customMessageDisplay(row, message)
         scaling = 0.7
     end
 
-    local boxWidth = (textLenght * 9 * scaling) + (20 * scaling)
+    local boxWidth = (textLength * 9 * scaling) + (20 * scaling)
 
     gui.drawBox(0, (row * rowheight * scaling), 0 + boxWidth, (row * rowheight * scaling) + (30 * scaling) - 1, 0xFFFFFFFF, constants.drawspace.moveDisplayBakgroundColor)
     gui.drawText((10 * scaling), 6 * scaling + (row * rowheight * scaling), message, 0xFFFFFFFF, 0x00000000, (14 * scaling), "Arial", "bold")
@@ -469,11 +486,11 @@ local function trialCommon(localTrialData, inputs)
         inputs = joypad.get() --update inputs so that they get verified properly
     end
 
-    if inputs["P1 L2"] and inputs["P1 Up"] and localTrialData.resetState ~= true and (emu.framecount() - commonVariables.lastResetFrame) > 60 then
+    if inputs["P1 L2"] and inputs["P1 D-Pad Up"] and localTrialData.resetState ~= true and (emu.framecount() - commonVariables.lastResetFrame) > 60 then
         localTrialData.resetState = true
     end
 
-    if inputs["P1 L2"] and inputs["P1 Down"] and localTrialData.demoOn ~= true and (emu.framecount() - commonVariables.lastResetFrame) > 60 then
+    if inputs["P1 L2"] and inputs["P1 D-Pad Down"] and localTrialData.demoOn ~= true and (emu.framecount() - commonVariables.lastResetFrame) > 60 then
         localTrialData.moves = nil
         localTrialData.demoOn = true
         return
@@ -530,22 +547,22 @@ local function alucardTrialRichterSkip(passedTrialData)
                     images = {constants.buttonImages.left},
                     description = "Left",
                     completed = false,
-                    buttons = {"P1 Left"},
+                    buttons = { mnemonics.Left },
                     failButtons = {
                         {
-                            button = "P1 Right",
+                            button = mnemonics.Right,
                             failMessage = "Out of position!"
                         },
                         {
-                            button = "P1 R2",
+                            button = mnemonics.Wolf,
                             failMessage = "Must be in wolf form!"
                         },
                         {
-                            button = "P1 R1",
+                            button = mnemonics.Bat,
                             failMessage = "Must be in wolf form!"
                         },
                         {
-                            button = "P1 Cross",
+                            button = mnemonics.Jump,
                             failMessage = "Jumped too early!"
                         },
                     },
@@ -556,22 +573,22 @@ local function alucardTrialRichterSkip(passedTrialData)
                     description = "hold Left",
                     text = nil,
                     completed = false,
-                    buttons = {"P1 Left"},
+                    buttons = { mnemonics.Left },
                     failButtons = {
                         {
-                            button = "P1 Right",
+                            button = mnemonics.Right,
                             failMessage = "Out of position!"
                         },
                         {
-                            button = "P1 R2",
+                            button = mnemonics.Wolf,
                             failMessage = "Must be in wolf form!"
                         },
                         {
-                            button = "P1 R1",
+                            button = mnemonics.Bat,
                             failMessage = "Must be in wolf form!"
                         },
                         {
-                            button = "P1 Cross",
+                            button = mnemonics.Jump,
                             failMessage = "Jumped too early!"
                         },
                     },
@@ -582,22 +599,22 @@ local function alucardTrialRichterSkip(passedTrialData)
                     description = "hold Left",
                     text = nil,
                     completed = false,
-                    buttons = {"P1 Left"},
+                    buttons = { mnemonics.Left },
                     failButtons = {
                         {
-                            button = "P1 Right",
+                            button = mnemonics.Right,
                             failMessage = "Out of position!"
                         },
                         {
-                            button = "P1 R2",
+                            button = mnemonics.Wolf,
                             failMessage = "Must be in wolf form!"
                         },
                         {
-                            button = "P1 R1",
+                            button = mnemonics.Bat,
                             failMessage = "Must be in wolf form!"
                         },
                         {
-                            button = "P1 Cross",
+                            button = mnemonics.Jump,
                             failMessage = "Jumped too early!"
                         },
                     },
@@ -608,22 +625,22 @@ local function alucardTrialRichterSkip(passedTrialData)
                     description = "Let go of Left",
                     text = nil,
                     completed = false,
-                    buttonsUp = {"P1 Left"},
+                    buttonsUp = { mnemonics.Left },
                     failButtons = {
                         {
-                            button = "P1 Right",
+                            button = mnemonics.Right,
                             failMessage = "Out of position!"
                         },
                         {
-                            button = "P1 R2",
+                            button = mnemonics.Wolf,
                             failMessage = "Must be in wolf form!"
                         },
                         {
-                            button = "P1 R1",
+                            button = mnemonics.Bat,
                             failMessage = "Must be in wolf form!"
                         },
                         {
-                            button = "P1 Cross",
+                            button = mnemonics.Jump,
                             failMessage = "Jumped too early!"
                         },
                     },
@@ -635,24 +652,24 @@ local function alucardTrialRichterSkip(passedTrialData)
                     text = "(hold)",
                     description = "Dash",
                     completed = false,
-                    buttons = {"P1 Left"},
+                    buttons = { mnemonics.Left },
                     failButtons = {
                         {
-                            button = "P1 R2",
-                            failMessage = "Must be in wolf form!"
-                        },
-                        {
-                            button = "P1 Cross",
-                            failMessage = "Jumped 1 frame too early!"
-                        },
-                        {
-                            button = "P1 Right",
+                            button = mnemonics.Right,
                             failMessage = "Out of position!"
                         },
                         {
-                            button = "P1 R1",
+                            button = mnemonics.Wolf,
                             failMessage = "Must be in wolf form!"
-                        }
+                        },
+                        {
+                            button = mnemonics.Bat,
+                            failMessage = "Must be in wolf form!"
+                        },
+                        {
+                            button = mnemonics.Jump,
+                            failMessage = "Jumped too early!"
+                        },
                     },
                     counter = true,
                     frameWindow = 10
@@ -660,21 +677,21 @@ local function alucardTrialRichterSkip(passedTrialData)
                     images = {constants.buttonImages.cross},
                     description = "jump",
                     completed = false,
-                    buttons = {"P1 Cross"},
-                    buttonsHold = {"P1 Left"},
+                    buttons = { mnemonics.Jump },
+                    buttonsHold = { mnemonics.Left },
                     failButtons = {
-                            {
-                                button = "P1 Right",
-                                failMessage = "Out of position!"
-                            },
-                            {
-                                button = "P1 R1",
-                                failMessage = "Must be in wolf form!"
-                            },
-                            {
-                                button = "P1 R2",
-                                failMessage = "Must be in wolf form!"
-                            }
+                        {
+                            button = mnemonics.Right,
+                            failMessage = "Out of position!"
+                        },
+                        {
+                            button = mnemonics.Wolf,
+                            failMessage = "Must be in wolf form!"
+                        },
+                        {
+                            button = mnemonics.Bat,
+                            failMessage = "Must be in wolf form!"
+                        },
                     },
                     counter = true,
                     frameWindow = 1,
@@ -684,7 +701,7 @@ local function alucardTrialRichterSkip(passedTrialData)
                     text = "(hold)",
                     description = "left(hold)",
                     completed = false,
-                    buttonsHold = {"P1 Left"},
+                    buttonsHold = { mnemonics.Left },
                     counter = true,
                     holdDuration = 30
                 }
@@ -767,8 +784,8 @@ local function alucardTrialFrontslide(passedTrialData)
                     images = {constants.buttonImages.downright, constants.buttonImages.cross},
                     description = "diagonal divekick",
                     completed = false,
-                    buttons = {"P1 Cross", "P1 Down"},
-                    buttonsOr = {"P1 Left", "P1 Right"},
+                    buttons = {"P1 Cross", "P1 D-Pad Down"},
+                    buttonsOr = {"P1 D-Pad Left", "P1 D-Pad Right"},
                     counter = true,
                     frameWindow = 13
                 }, {
@@ -801,7 +818,7 @@ local function alucardTrialFrontslide(passedTrialData)
     end
 
     if localTrialData.failedState == false and localTrialData.successState == false and localTrialData.moves[6].completed and localTrialData.groundedFramesAfterDive > 4 then
-        if inputs["P1 Left"] or inputs["P1 Right"] or inputs["P1 Down"] then
+        if inputs["P1 D-Pad Left"] or inputs["P1 D-Pad Right"] or inputs["P1 D-Pad Down"] then
             localTrialData.moves[7].completed = false
             localTrialData.failedState = true
             localTrialData.mistakeMessage = "Did not release directions before landing!"
@@ -1310,7 +1327,7 @@ local function alucardChallengeForceOfEchoTimeTrial(passedTrialData)
         localTrialData.frameCounter = 0
     end
 
-    if inputs["P1 L2"] and inputs["P1 Up"] and (emu.framecount() - commonVariables.lastResetFrame) > 60 then
+    if inputs["P1 L2"] and inputs["P1 D-Pad Up"] and (emu.framecount() - commonVariables.lastResetFrame) > 60 then
         return {}
     end
 
@@ -1363,7 +1380,7 @@ local function richterTrialSlidingAirslash(passedTrialData)
                     images = {constants.buttonImages.up},
                     description = "up",
                     completed = false,
-                    buttons = {"P1 Up"},
+                    buttons = {"P1 D-Pad Up"},
                     failButtons = {
                         {
                             button = "P1 Cross",
@@ -1387,7 +1404,7 @@ local function richterTrialSlidingAirslash(passedTrialData)
                     images = {constants.buttonImages.down},
                     description = "down",
                     completed = false,
-                    buttons = {"P1 Down"},
+                    buttons = {mnemonics.Down},
                     failButtons = {
                         {
                             button = "P1 Cross",
@@ -1535,7 +1552,7 @@ local function richterTrialVaultingAirslash(passedTrialData)
                     images = {constants.buttonImages.up},
                     description = "up",
                     completed = false,
-                    buttons = {"P1 Up"},
+                    buttons = {"P1 D-Pad Up"},
                     failButtons = {},
                     counter = true
                 }, {
@@ -1647,7 +1664,7 @@ local function richterTrialOtgAirslash(passedTrialData)
                     images = {constants.buttonImages.up},
                     description = "up",
                     completed = false,
-                    buttons = {"P1 Up"},
+                    buttons = {"P1 D-Pad Up"},
                     failButtons = {
                         {
                             button = "P1 Cross",
