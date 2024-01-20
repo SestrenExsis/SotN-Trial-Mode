@@ -1,8 +1,14 @@
 # SOTN Trial Mode
 Trials and challenges for Castlevania: SotN through a LUA script for Bizhawk, intended to help runners with learning essential speedrunning tricks and test players with difficult and interesting challenges.
-## Version 0.9.2
+
+## Version 0.9.3
 Releasing this early to test out how it behaves for others and if any major issues pop up. Current version aims to achieve a stable engine, where I can continue to add trials in the future.
+
 ### changelog
+
+#### 0.9.3
+* Updated save states for Bizhawk version 2.9.1
+
 #### 0.9.2
 * Added beta pause buffering support
 * Added Richter Skip Wolf trial
