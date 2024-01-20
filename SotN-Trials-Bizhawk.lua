@@ -1193,13 +1193,11 @@ local function alucardChallengeShieldDashSpeed(passedTrialData)
 
     --create infinite room by wrapping x position
     if currentXpos > 991 then
-        mainmemory.write_u16_le(constants.memoryData.characterXpos,
-                                384 + (991 - currentXpos))
-        currentXpos = 384 + (991 - currentXpos)
+        currentXpos = 384 + (currentXpos - 991)
+        mainmemory.write_u16_le(constants.memoryData.characterXpos, currentXpos)
     elseif currentXpos < 384 then
-        mainmemory.write_u16_le(constants.memoryData.characterXpos,
-                                991 - (384 - currentXpos))
         currentXpos = 991 - (384 - currentXpos)
+        mainmemory.write_u16_le(constants.memoryData.characterXpos, currentXpos)
     end
 
     localTrialData.lastXpos = currentXpos
