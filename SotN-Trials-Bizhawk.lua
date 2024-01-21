@@ -1,11 +1,23 @@
 -----------------------------------------------------------
 -- Castlevania: Symphony of the Night Trials for Bizhawk --
 -----------------------------------------------------------
----By TalicZealot---
+---original version by TalicZealot---
 --------------------
 require "Utilities/List"
 require "Utilities/Serialization"
 require "Utilities/UserInterface"
+
+local function getVersion()
+    local version = "legacy"
+    if client ~= nil and client.getversion ~= nil then
+        version = client.getversion()
+    end
+    -- TODO(sestren): Remove patch version in a more sensible way
+    if version == "2.9.1" then
+        version = "2.9"
+    end
+    return version
+end
 
 local settings = {consistencyTraining = false, autoContinue = true, renderPixelPro = true}
 local saveData = {
@@ -23,6 +35,7 @@ local saveData = {
 deserializeToObject(settings, "config.ini")
 deserializeToObject(saveData, "config.ini")
 
+-- Input names are different depending on which version of Bizhawk you are running
 mnemonics = {
     Up = "P1 D-Pad Up",
     Down = "P1 D-Pad Down",
@@ -39,6 +52,17 @@ mnemonics = {
     Map = "P1 Select",
     Menu = "P1 Start"
 }
+-- TODO(sestren): Figure out how many input name variants there were and when they were introduced
+if getVersion() == "legacy" then
+    mnemonics.Up = "P1 Up"
+    mnemonics.Down = "P1 Down"
+    mnemonics.Left = "P1 Left"
+    mnemonics.Right = "P1 Right"
+    mnemonics.Attack = "P1 Square"
+    mnemonics.Dash = "P1 Triangle"
+    mnemonics.Shield = "P1 Circle"
+    mnemonics.Jump = "P1 Cross"
+end
 
 local constants = {
     drawspace = {
@@ -53,16 +77,16 @@ local constants = {
     drawingOffsetX = 150,
     drawingOffsetY = 40,
     savestates = {
-        "states/AlucardRichterSkip.State",
-        "states/AlucardFrontslide.State",
-        "states/AlucardAutodash.State",
-        "states/AlucardAutodash.State",
-        "states/AlucardShieldDahSpeed.State",
-        "states/AlucardForceOfEchoTimeTrial.State",
-        "states/RichterSlidingAirslash.State",
-        "states/RichterVaultingAirslash.State",
-        "states/RichterVaultingAirslash.State",
-        "states/RichterMinotaur.State"
+        "Alucard - Richter Skip",
+        "Alucard - Frontslide",
+        "Alucard - Library Floor Clip",
+        "Alucard - Library Floor Clip",
+        "Alucard - Shield Dash",
+        "Alucard - Force of Echo",
+        "Richter - Sliding Airslash",
+        "Richter - Vaulting Airslash",
+        "Richter - Vaulting Airslash",
+        "Richter - Minotaur"
     },
     memoryData = {
         characterXpos = 0x0973F0,
@@ -523,6 +547,12 @@ local function trialCommon(localTrialData, inputs)
     end
 end
 
+local function loadSavestate()
+    local fileName = constants.savestates[commonVariables.currentTrial]
+    local filePath = "states/"..fileName.." "..getVersion()..".State"
+    savestate.load(filePath)
+end
+
 -------------------
 --Trial Functions--
 ------Alucard------
@@ -530,7 +560,7 @@ local function alucardTrialRichterSkip(passedTrialData)
     local localTrialData = passedTrialData
     --initialize trial data on start or restart
     if localTrialData.moves == nil then
-        savestate.load(constants.savestates[commonVariables.currentTrial])
+        loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
             demoOn = passedTrialData.demoOn,
@@ -744,7 +774,7 @@ end
 local function alucardTrialFrontslide(passedTrialData)
     local localTrialData = passedTrialData
     if localTrialData.moves == nil then
-        savestate.load(constants.savestates[commonVariables.currentTrial])
+        loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
             demoOn = passedTrialData.demoOn,
@@ -865,7 +895,7 @@ local function alucardTrialAutodash(passedTrialData)
     local localTrialData = passedTrialData
     --initialize trial data on start or restart
     if localTrialData.moves == nil then
-        savestate.load(constants.savestates[commonVariables.currentTrial])
+        loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
             demoOn = passedTrialData.demoOn,
@@ -983,7 +1013,7 @@ end
 local function alucardTrialFloorClip(passedTrialData)
     local localTrialData = passedTrialData
     if localTrialData.moves == nil then
-        savestate.load(constants.savestates[commonVariables.currentTrial])
+        loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
             demoOn = passedTrialData.demoOn,
@@ -1137,7 +1167,7 @@ local function alucardChallengeShieldDashSpeed(passedTrialData)
     local currentXpos = mainmemory.read_u16_le(
                             constants.memoryData.characterXpos)
     if localTrialData.moves == nil then
-        savestate.load(constants.savestates[commonVariables.currentTrial])
+        loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
             demoOn = passedTrialData.demoOn,
@@ -1253,7 +1283,7 @@ end
 local function alucardChallengeForceOfEchoTimeTrial(passedTrialData)
     local localTrialData = passedTrialData
     if localTrialData.moves == nil then
-        savestate.load(constants.savestates[commonVariables.currentTrial])
+        loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
             demoOn = passedTrialData.demoOn,
@@ -1363,7 +1393,7 @@ end
 local function richterTrialSlidingAirslash(passedTrialData)
     local localTrialData = passedTrialData
     if localTrialData.moves == nil then
-        savestate.load(constants.savestates[commonVariables.currentTrial])
+        loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
             demoOn = passedTrialData.demoOn,
@@ -1491,7 +1521,7 @@ end
 local function richterTrialVaultingAirslash(passedTrialData)
     local localTrialData = passedTrialData
     if localTrialData.moves == nil then
-        savestate.load(constants.savestates[commonVariables.currentTrial])
+        loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
             demoOn = passedTrialData.demoOn,
@@ -1647,7 +1677,7 @@ end
 local function richterTrialOtgAirslash(passedTrialData)
     local localTrialData = passedTrialData
     if localTrialData.moves == nil then
-        savestate.load(constants.savestates[commonVariables.currentTrial])
+        loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
             demoOn = passedTrialData.demoOn,
@@ -1772,7 +1802,7 @@ end
 local function richterChallengeMinotaurRoomTimeTrial(passedTrialData)
     local localTrialData = passedTrialData
     if localTrialData.moves == nil then
-        savestate.load(constants.savestates[commonVariables.currentTrial])
+        loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
             demoOn = passedTrialData.demoOn,
