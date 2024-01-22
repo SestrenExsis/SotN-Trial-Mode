@@ -89,6 +89,7 @@ local constants = {
         "Richter - Minotaur"
     },
     memoryData = {
+        buttons = 0x007572, -- 2 bytes
         characterXpos = 0x0973F0,
         characterYpos = 0x0973F4,
         subpixelValue = 0x13759D,
@@ -311,25 +312,28 @@ local function verifyInputs(localTrialData, inputs)
     --check buttons required to be pressed
     if localTrialData.moves[localTrialData.currentMove].buttons ~= nil then
         for i = 1, #localTrialData.moves[localTrialData.currentMove].buttons do
-            if localTrialData.moves[localTrialData.currentMove].frameWindow ~= nil and inputs[localTrialData.moves[localTrialData.currentMove].buttons[i]] and
-                localTrialData.frameCounter > localTrialData.moves[localTrialData.currentMove].frameWindow then
+            if localTrialData.moves[localTrialData.currentMove].frameWindow ~= nil and
+                inputs[localTrialData.moves[localTrialData.currentMove].buttons[i]] and
+                localTrialData.frameCounter > localTrialData.moves[localTrialData.currentMove].frameWindow
+            then
                 localTrialData.failedState = true
                 localTrialData.mistakeMessage =
                     "Pressed " ..
-                        localTrialData.moves[localTrialData.currentMove].description .. " " .. localTrialData.frameCounter - localTrialData.moves[localTrialData.currentMove].frameWindow ..
-                        " frames too late!"
-                    return
-            elseif localTrialData.moves[localTrialData.currentMove].minimumGap ~= nil and  inputs[localTrialData.moves[localTrialData.currentMove].buttons[i]] and
-                localTrialData.frameCounter < localTrialData.moves[localTrialData.currentMove].minimumGap then
+                    localTrialData.moves[localTrialData.currentMove].description .. " " .. localTrialData.frameCounter - localTrialData.moves[localTrialData.currentMove].frameWindow ..
+                    " frames too late!"
+                return
+            elseif localTrialData.moves[localTrialData.currentMove].minimumGap ~= nil and
+                inputs[localTrialData.moves[localTrialData.currentMove].buttons[i]] and
+                localTrialData.frameCounter < localTrialData.moves[localTrialData.currentMove].minimumGap
+            then
                 localTrialData.failedState = true
                 localTrialData.mistakeMessage =
                     "Pressed " ..
-                        localTrialData.moves[localTrialData.currentMove].description .. " "  .. localTrialData.moves[localTrialData.currentMove].minimumGap - localTrialData.frameCounter ..
-                        " frames too early!"
-                    return
+                    localTrialData.moves[localTrialData.currentMove].description .. " "  .. localTrialData.moves[localTrialData.currentMove].minimumGap - localTrialData.frameCounter ..
+                    " frames too early!"
+                return
             else
-                inputCondition = inputCondition and inputs[localTrialData.moves[localTrialData.currentMove]
-                                         .buttons[i]]
+                inputCondition = inputCondition and inputs[localTrialData.moves[localTrialData.currentMove].buttons[i]]
             end
         end
     end
@@ -361,24 +365,26 @@ local function verifyInputs(localTrialData, inputs)
     --check buttons required to be released
     if localTrialData.moves[localTrialData.currentMove].buttonsUp ~= nil then
         for i = 1, #localTrialData.moves[localTrialData.currentMove].buttonsUp do
-            if localTrialData.moves[localTrialData.currentMove].frameWindow ~= nil and inputs[localTrialData.moves[localTrialData.currentMove].buttonsUp[i]] ==
-                false and localTrialData.frameCounter >
-                localTrialData.moves[localTrialData.currentMove].frameWindow then
+            if localTrialData.moves[localTrialData.currentMove].frameWindow ~= nil and
+                inputs[localTrialData.moves[localTrialData.currentMove].buttonsUp[i]] == false and
+                localTrialData.frameCounter > localTrialData.moves[localTrialData.currentMove].frameWindow
+            then
                 localTrialData.failedState = true
                 localTrialData.mistakeMessage =
                     "Released " ..
-                        localTrialData.moves[localTrialData.currentMove].buttonsUp[i] ..
-                        " outside of buffer window or too slow!"
+                    localTrialData.moves[localTrialData.currentMove].buttonsUp[i] ..
+                    " outside of buffer window or too slow!"
                 return
-            elseif localTrialData.moves[localTrialData.currentMove].minimumGap ~= nil and inputs[localTrialData.moves[localTrialData.currentMove].buttonsUp[i]] ==
-                false and localTrialData.frameCounter <
-                localTrialData.moves[localTrialData.currentMove].minimumGap then
+            elseif localTrialData.moves[localTrialData.currentMove].minimumGap ~= nil and
+                inputs[localTrialData.moves[localTrialData.currentMove].buttonsUp[i]] == false and
+                localTrialData.frameCounter < localTrialData.moves[localTrialData.currentMove].minimumGap
+            then
                 localTrialData.failedState = true
                 localTrialData.mistakeMessage =
                     "Released " ..
-                        localTrialData.moves[localTrialData.currentMove].buttonsUp[i] ..
-                        " too early!"
-                    return
+                    localTrialData.moves[localTrialData.currentMove].buttonsUp[i] ..
+                    " too early!"
+                return
             elseif inputs[localTrialData.moves[localTrialData.currentMove].buttonsUp[i]] then
                 inputCondition = false
             end
@@ -400,11 +406,13 @@ local function verifyInputs(localTrialData, inputs)
     end
 
     --check if input window has expired
-    if inputCondition == false and localTrialData.moves[localTrialData.currentMove].frameWindow ~= nil and localTrialData.frameCounter > localTrialData.moves[localTrialData.currentMove].frameWindow
-        and localTrialData.moves[localTrialData.currentMove].frameWindow - localTrialData.frameCounter > 20 then
+    if inputCondition == false and
+        localTrialData.moves[localTrialData.currentMove].frameWindow ~= nil and
+        localTrialData.frameCounter > localTrialData.moves[localTrialData.currentMove].frameWindow and
+        localTrialData.moves[localTrialData.currentMove].frameWindow - localTrialData.frameCounter > 20
+    then
         localTrialData.failedState = true
-        localTrialData.mistakeMessage =
-        "Did not press " ..
+        localTrialData.mistakeMessage = "Did not press " ..
             localTrialData.moves[localTrialData.currentMove].description ..
             " in time!"
         return
@@ -434,7 +442,10 @@ local function runDemo(localTrialData)
         return
     end
 
-    if localTrialData.moves[localTrialData.currentMove].buttonsOr ~= nil and localTrialData.moves[localTrialData.currentMove].minimumGap ~= nil and localTrialData.frameCounter == localTrialData.moves[localTrialData.currentMove].minimumGap then
+    if localTrialData.moves[localTrialData.currentMove].buttonsOr ~= nil and
+        localTrialData.moves[localTrialData.currentMove].minimumGap ~= nil and
+        localTrialData.frameCounter == localTrialData.moves[localTrialData.currentMove].minimumGap
+    then
         inputsToSet[localTrialData.moves[localTrialData.currentMove].buttonsOr[1]] = true
     elseif localTrialData.moves[localTrialData.currentMove].buttonsOr ~= nil then
         inputsToSet[localTrialData.moves[localTrialData.currentMove].buttonsOr[1]] = true
@@ -598,60 +609,15 @@ local function alucardTrialRichterSkip(passedTrialData)
                         },
                     },
                     counter = true
-                },
-                {
+                }, {
                     skipDrawing = true,
-                    description = "hold Left",
-                    text = nil,
+                    text = "(hold)",
+                    description = "left(hold)",
                     completed = false,
-                    buttons = { mnemonics.Left },
-                    failButtons = {
-                        {
-                            button = mnemonics.Right,
-                            failMessage = "Out of position!"
-                        },
-                        {
-                            button = mnemonics.Wolf,
-                            failMessage = "Must be in wolf form!"
-                        },
-                        {
-                            button = mnemonics.Bat,
-                            failMessage = "Must be in wolf form!"
-                        },
-                        {
-                            button = mnemonics.Jump,
-                            failMessage = "Jumped too early!"
-                        },
-                    },
-                    counter = true
-                },
-                {
-                    skipDrawing = true,
-                    description = "hold Left",
-                    text = nil,
-                    completed = false,
-                    buttons = { mnemonics.Left },
-                    failButtons = {
-                        {
-                            button = mnemonics.Right,
-                            failMessage = "Out of position!"
-                        },
-                        {
-                            button = mnemonics.Wolf,
-                            failMessage = "Must be in wolf form!"
-                        },
-                        {
-                            button = mnemonics.Bat,
-                            failMessage = "Must be in wolf form!"
-                        },
-                        {
-                            button = mnemonics.Jump,
-                            failMessage = "Jumped too early!"
-                        },
-                    },
-                    counter = true
-                },
-                {
+                    buttonsHold = { mnemonics.Left },
+                    counter = true,
+                    holdDuration = 2
+                }, {
                     skipDrawing = true,
                     description = "Let go of Left",
                     text = nil,
@@ -677,8 +643,7 @@ local function alucardTrialRichterSkip(passedTrialData)
                     },
                     counter = true,
                     frameWindow = 7
-                },
-                 {
+                }, {
                     images = {constants.buttonImages.left},
                     text = "(hold)",
                     description = "Dash",
@@ -734,7 +699,7 @@ local function alucardTrialRichterSkip(passedTrialData)
                     completed = false,
                     buttonsHold = { mnemonics.Left },
                     counter = true,
-                    holdDuration = 30
+                    holdDuration = 90
                 }
             }
         }
@@ -746,7 +711,21 @@ local function alucardTrialRichterSkip(passedTrialData)
         return localTrialData
     end
 
-    --special case checks would go here
+    --special case checks
+    if localTrialData.failedState == false and localTrialData.successState == false then
+        local cameraX = mainmemory.read_u16_le(0x1375AC)
+        local cameraY = mainmemory.read_u16_le(0x1375B0)
+        if cameraX <= 1387 then
+            if cameraY == 767 then
+                localTrialData.failedState = true
+                localTrialData.mistakeMessage = "Unknown reason for failure"
+            end
+        elseif cameraX <= 1454 then
+            if cameraY ~= 767 then
+                localTrialData.successState = true
+            end
+        end
+    end
 
     --returning an empty table restarts the trial
     if localTrialData.failedState and localTrialData.frameCounter > 160 then
