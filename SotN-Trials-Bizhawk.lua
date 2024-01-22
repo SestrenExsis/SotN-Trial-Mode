@@ -699,7 +699,15 @@ local function alucardTrialRichterSkip(passedTrialData)
                     completed = false,
                     buttonsHold = { mnemonics.Left },
                     counter = true,
-                    holdDuration = 90
+                    holdDuration = 30
+                }, {
+                    skipDrawing = true,
+                    text = "(hold)",
+                    description = "left(hold)",
+                    completed = false,
+                    buttonsHold = { mnemonics.Left },
+                    counter = true,
+                    holdDuration = 60
                 }
             }
         }
@@ -714,16 +722,14 @@ local function alucardTrialRichterSkip(passedTrialData)
     --special case checks
     if localTrialData.failedState == false and localTrialData.successState == false then
         local cameraX = mainmemory.read_u16_le(0x1375AC)
-        local cameraY = mainmemory.read_u16_le(0x1375B0)
-        if cameraX <= 1387 then
-            if cameraY == 767 then
-                localTrialData.failedState = true
-                localTrialData.mistakeMessage = "Unknown reason for failure"
-            end
-        elseif cameraX <= 1454 then
-            if cameraY ~= 767 then
-                localTrialData.successState = true
-            end
+        -- local cameraY = mainmemory.read_u16_le(0x1375B0)
+        -- TODO(sestren): Verify that 0x0730C1 is a reliable address for detecting a locked camera
+        local cameraLock = mainmemory.read_u8(0x0730C1)
+        if cameraX <= 1447 and cameraLock == 0 then
+            localTrialData.successState = true
+        elseif cameraX <= 1474 and cameraLock ~= 0 then
+            localTrialData.failedState = true
+            localTrialData.mistakeMessage = "Touched the invisible hitbox"
         end
     end
 
