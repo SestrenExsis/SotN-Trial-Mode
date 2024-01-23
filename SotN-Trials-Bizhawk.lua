@@ -442,32 +442,52 @@ local function runDemo(localTrialData)
         return
     end
 
-    if localTrialData.moves[localTrialData.currentMove].buttonsOr ~= nil and
-        localTrialData.moves[localTrialData.currentMove].minimumGap ~= nil and
-        localTrialData.frameCounter == localTrialData.moves[localTrialData.currentMove].minimumGap
-    then
-        inputsToSet[localTrialData.moves[localTrialData.currentMove].buttonsOr[1]] = true
-    elseif localTrialData.moves[localTrialData.currentMove].buttonsOr ~= nil then
-        inputsToSet[localTrialData.moves[localTrialData.currentMove].buttonsOr[1]] = true
-    end
-
-    if localTrialData.moves[localTrialData.currentMove].buttons ~= nil then
-        for i = 1, #localTrialData.moves[localTrialData.currentMove].buttons do
-            if localTrialData.moves[localTrialData.currentMove].minimumGap ~= nil and localTrialData.frameCounter == localTrialData.moves[localTrialData.currentMove].minimumGap then
-                inputsToSet[localTrialData.moves[localTrialData.currentMove].buttons[i]] = true
-            elseif localTrialData.moves[localTrialData.currentMove].minimumGap == nil then
-                inputsToSet[localTrialData.moves[localTrialData.currentMove].buttons[i]] = true
+    if localTrialData.demoInputs ~= nil and #localTrialData.demoInputs > 0 then
+        -- If demo inputs are given, use those instead
+        if localTrialData.demoInputs[1].duration ~= nil and
+            localTrialData.demoInputs[1].buttons ~= nil
+        then
+            for i = 1, #localTrialData.demoInputs[1].buttons do
+                inputsToSet[localTrialData.demoInputs[1].buttons[i]] = true
+            end
+            localTrialData.demoInputs[1].duration = localTrialData.demoInputs[1].duration - 1
+            if localTrialData.demoInputs[1].duration < 1 then
+                table.remove(localTrialData.demoInputs, 1)
             end
         end
-    end
+        if #localTrialData.demoInputs < 1 then
+            localTrialData.demoOn = false
+        end
+    else
+        if localTrialData.moves[localTrialData.currentMove].buttonsOr ~= nil and
+            localTrialData.moves[localTrialData.currentMove].minimumGap ~= nil and
+            localTrialData.frameCounter == localTrialData.moves[localTrialData.currentMove].minimumGap
+        then
+            inputsToSet[localTrialData.moves[localTrialData.currentMove].buttonsOr[1]] = true
+        elseif localTrialData.moves[localTrialData.currentMove].buttonsOr ~= nil then
+            inputsToSet[localTrialData.moves[localTrialData.currentMove].buttonsOr[1]] = true
+        end
 
-    --special case checks go here
+        if localTrialData.moves[localTrialData.currentMove].buttons ~= nil then
+            for i = 1, #localTrialData.moves[localTrialData.currentMove].buttons do
+                if localTrialData.moves[localTrialData.currentMove].minimumGap ~= nil and
+                    localTrialData.frameCounter == localTrialData.moves[localTrialData.currentMove].minimumGap
+                then
+                    inputsToSet[localTrialData.moves[localTrialData.currentMove].buttons[i]] = true
+                elseif localTrialData.moves[localTrialData.currentMove].minimumGap == nil then
+                    inputsToSet[localTrialData.moves[localTrialData.currentMove].buttons[i]] = true
+                end
+            end
+        end
 
-    --------------------
-
-    if localTrialData.moves[localTrialData.currentMove].buttonsHold ~= nil then
-        for i = 1, #localTrialData.moves[localTrialData.currentMove].buttonsHold do
-            inputsToSet[localTrialData.moves[localTrialData.currentMove].buttonsHold[i]] = true
+        --special case checks go here
+    
+        --------------------
+    
+        if localTrialData.moves[localTrialData.currentMove].buttonsHold ~= nil then
+            for i = 1, #localTrialData.moves[localTrialData.currentMove].buttonsHold do
+                inputsToSet[localTrialData.moves[localTrialData.currentMove].buttonsHold[i]] = true
+            end
         end
     end
 
@@ -486,13 +506,13 @@ local function trialCommon(localTrialData, inputs)
     local map = memory.readbyte(constants.memoryData.mapOpen)
 
     if map == 1 and localTrialData.mapOpen ~= true and (localTrialData.mapClosed == nil or localTrialData.mapClosed > 2) then
-      localTrialData.frameCounter = localTrialData.frameCounter + 2
+        localTrialData.frameCounter = localTrialData.frameCounter + 2
     elseif map == 1 and localTrialData.mapOpen ~= true and localTrialData.mapClosed < 3 then
         localTrialData.frameCounter = localTrialData.frameCounter + 1
     end
 
     if map == 0 and localTrialData.mapOpen == true then
-      localTrialData.frameCounter = localTrialData.frameCounter - 1
+        localTrialData.frameCounter = localTrialData.frameCounter - 1
     end
 
     if map == 1 and localTrialData.mapOpen ~= true then 
@@ -516,9 +536,14 @@ local function trialCommon(localTrialData, inputs)
     --end
     --print(localTrialData.frameCounter)
 
-    if localTrialData.demoOn and localTrialData.failedState == false and localTrialData.successState == false then
-        runDemo(localTrialData)
-        inputs = joypad.get() --update inputs so that they get verified properly
+    if localTrialData.demoOn then
+        if localTrialData.demoInputs ~= nil or
+            localTrialData.failedState == false and
+            localTrialData.successState == false
+        then
+            runDemo(localTrialData)
+            inputs = joypad.get() --update inputs so that they get verified properly
+        end
     end
 
     if inputs[mnemonics.L2] and inputs[mnemonics.Up] and localTrialData.resetState ~= true and (emu.framecount() - commonVariables.lastResetFrame) > 60 then
@@ -611,14 +636,6 @@ local function alucardTrialRichterSkip(passedTrialData)
                     counter = true
                 }, {
                     skipDrawing = true,
-                    text = "(hold)",
-                    description = "left(hold)",
-                    completed = false,
-                    buttonsHold = { mnemonics.Left },
-                    counter = true,
-                    holdDuration = 2
-                }, {
-                    skipDrawing = true,
                     description = "Let go of Left",
                     text = nil,
                     completed = false,
@@ -642,7 +659,7 @@ local function alucardTrialRichterSkip(passedTrialData)
                         },
                     },
                     counter = true,
-                    frameWindow = 7
+                    frameWindow = 10
                 }, {
                     images = {constants.buttonImages.left},
                     text = "(hold)",
@@ -668,7 +685,7 @@ local function alucardTrialRichterSkip(passedTrialData)
                         },
                     },
                     counter = true,
-                    frameWindow = 10
+                    frameWindow = 8
                 }, {
                     images = {constants.buttonImages.cross},
                     description = "jump",
@@ -699,16 +716,15 @@ local function alucardTrialRichterSkip(passedTrialData)
                     completed = false,
                     buttonsHold = { mnemonics.Left },
                     counter = true,
-                    holdDuration = 30
-                }, {
-                    skipDrawing = true,
-                    text = "(hold)",
-                    description = "left(hold)",
-                    completed = false,
-                    buttonsHold = { mnemonics.Left },
-                    counter = true,
-                    holdDuration = 60
+                    holdDuration = 26
                 }
+            },
+            demoInputs = {
+                { duration = 3, buttons = { mnemonics.Left } },
+                { duration = 3, buttons = {  } },
+                { duration = 1, buttons = { mnemonics.Left } },
+                { duration = 3, buttons = { mnemonics.Left, mnemonics.Jump } },
+                { duration = 40, buttons = { mnemonics.Left } }
             }
         }
     end
@@ -720,14 +736,20 @@ local function alucardTrialRichterSkip(passedTrialData)
     end
 
     --special case checks
-    if localTrialData.failedState == false and localTrialData.successState == false then
-        local cameraX = mainmemory.read_u16_le(0x1375AC)
-        -- local cameraY = mainmemory.read_u16_le(0x1375B0)
-        -- TODO(sestren): Verify that 0x0730C1 is a reliable address for detecting a locked camera
-        local cameraLock = mainmemory.read_u8(0x0730C1)
-        if cameraX <= 1447 and cameraLock == 0 then
+    -- TODO(sestren): Verify that 0x0730C1 is a reliable address for detecting a locked camera
+    local cameraX = mainmemory.read_u16_le(0x1375AC)
+    -- local cameraY = mainmemory.read_u16_le(0x1375B0)
+    local cameraLock = mainmemory.read_u8(0x0730C1)
+    if cameraX <= 1447 and cameraLock == 0 then -- TODO(sestren): Would 1451 work?
+        if localTrialData.failedState == true then
+            localTrialData.mistakeMessage = "FALSE NEGATIVE"
+        else
             localTrialData.successState = true
-        elseif cameraX <= 1474 and cameraLock ~= 0 then
+        end
+    elseif cameraX <= 1474 and cameraLock ~= 0 then
+        if localTrialData.successState == true then
+            localTrialData.mistakeMessage = "FALSE POSITIVE"
+        elseif localTrialData.failedState == false then
             localTrialData.failedState = true
             localTrialData.mistakeMessage = "Touched the invisible hitbox"
         end
@@ -1296,19 +1318,23 @@ local function alucardChallengeForceOfEchoTimeTrial(passedTrialData)
 
     if localTrialData.counterOn then
         localTrialData.frameCounter = localTrialData.frameCounter + 1
-        if localTrialData.frameCounter % 60 == 0 and localTrialData.failedState ==
-            false and localTrialData.successState == false then
+        if localTrialData.frameCounter % 60 == 0 and
+            localTrialData.failedState == false and
+            localTrialData.successState == false
+        then
             localTrialData.seconds = localTrialData.seconds + 1
             localTrialData.milliseconds = localTrialData.seconds
         elseif localTrialData.failedState == false and
-            localTrialData.successState == false then
+            localTrialData.successState == false
+        then
             localTrialData.milliseconds = localTrialData.milliseconds + 0.0166
         end
         customMessageDisplay(1, string.format("%2.3f", localTrialData.milliseconds))
     end
 
     if mainmemory.readbyte(constants.memoryData.forceOfEcho) == 3 and
-        localTrialData.hasForceOfEcho == false then
+        localTrialData.hasForceOfEcho == false
+    then
         localTrialData.hasForceOfEcho = true
         localTrialData.timeAtFOE = string.format("%2.3f", localTrialData.milliseconds)
     end
@@ -1318,24 +1344,29 @@ local function alucardChallengeForceOfEchoTimeTrial(passedTrialData)
     end
 
     if localTrialData.start and
-        mainmemory.readbyte(constants.memoryData.currentRoom) ==
-        constants.memoryData.roomForceOfEchoValue and
-        localTrialData.hasForceOfEcho == false and localTrialData.failedState ==
-        false and localTrialData.successState == false then
+        mainmemory.readbyte(constants.memoryData.currentRoom) == constants.memoryData.roomForceOfEchoValue and
+        localTrialData.hasForceOfEcho == false and
+        localTrialData.failedState == false and
+        localTrialData.successState == false
+    then
         localTrialData.failedState = true
         localTrialData.frameCounter = 0
     elseif localTrialData.start and
-        mainmemory.readbyte(constants.memoryData.currentRoom) ==
-        constants.memoryData.roomForceOfEchoValue and
-        localTrialData.hasForceOfEcho and localTrialData.failedState == false and
-        localTrialData.successState == false then
+        mainmemory.readbyte(constants.memoryData.currentRoom) == constants.memoryData.roomForceOfEchoValue and
+        localTrialData.hasForceOfEcho and
+        localTrialData.failedState == false and
+        localTrialData.successState == false
+    then
         localTrialData.successState = true
         localTrialData.frameCounter = 0
     end
 
-    if localTrialData.start and localTrialData.seconds > 28 and
-        localTrialData.milliseconds > 29.5 and localTrialData.failedState ==
-        false and localTrialData.successState == false then
+    if localTrialData.start and
+        localTrialData.seconds > 28 and
+        localTrialData.milliseconds > 29.5 and
+        localTrialData.failedState == false and
+        localTrialData.successState == false
+    then
         localTrialData.failedState = true
         localTrialData.mistakeMessage = "Too slow!"
         localTrialData.frameCounter = 0
