@@ -611,8 +611,9 @@ local function alucardTrialRichterSkip(passedTrialData)
             moves = {
                 {text = "Autodash:", completed = true},
                 {
-                    images = {constants.buttonImages.left},
                     description = "Left",
+                    images = {constants.buttonImages.left},
+                    text = nil,
                     completed = false,
                     buttons = { mnemonics.Left },
                     failButtons = {
@@ -635,8 +636,8 @@ local function alucardTrialRichterSkip(passedTrialData)
                     },
                     counter = true
                 }, {
-                    skipDrawing = true,
                     description = "Let go of Left",
+                    skipDrawing = true,
                     text = nil,
                     completed = false,
                     buttonsUp = { mnemonics.Left },
@@ -661,9 +662,9 @@ local function alucardTrialRichterSkip(passedTrialData)
                     counter = true,
                     frameWindow = 10
                 }, {
+                    description = "Dash",
                     images = {constants.buttonImages.left},
                     text = "(hold)",
-                    description = "Dash",
                     completed = false,
                     buttons = { mnemonics.Left },
                     failButtons = {
@@ -687,8 +688,9 @@ local function alucardTrialRichterSkip(passedTrialData)
                     counter = true,
                     frameWindow = 8
                 }, {
-                    images = {constants.buttonImages.cross},
                     description = "jump",
+                    images = {constants.buttonImages.cross},
+                    text = nil,
                     completed = false,
                     buttons = { mnemonics.Jump },
                     buttonsHold = { mnemonics.Left },
@@ -710,13 +712,19 @@ local function alucardTrialRichterSkip(passedTrialData)
                     frameWindow = 1,
                     minimumGap = 1
                 }, {
+                    description = "left(hold)",
                     images = {constants.buttonImages.left},
                     text = "(hold)",
-                    description = "left(hold)",
                     completed = false,
                     buttonsHold = { mnemonics.Left },
                     counter = true,
-                    holdDuration = 26
+                    holdDuration = 20
+                }, {
+                    description = "Wait for visual cue",
+                    text = "Wait for visual cue",
+                    manualCheck = true,
+                    completed = false,
+                    counter = true
                 }
             },
             demoInputs = {
@@ -736,22 +744,33 @@ local function alucardTrialRichterSkip(passedTrialData)
     end
 
     --special case checks
-    -- TODO(sestren): Verify that 0x0730C1 is a reliable address for detecting a locked camera
-    local cameraX = mainmemory.read_u16_le(0x1375AC)
-    -- local cameraY = mainmemory.read_u16_le(0x1375B0)
-    local cameraLock = mainmemory.read_u8(0x0730C1)
-    if cameraX <= 1447 and cameraLock == 0 then -- TODO(sestren): Would 1451 work?
-        if localTrialData.failedState == true then
-            localTrialData.mistakeMessage = "FALSE NEGATIVE"
-        else
-            localTrialData.successState = true
-        end
-    elseif cameraX <= 1474 and cameraLock ~= 0 then
-        if localTrialData.successState == true then
-            localTrialData.mistakeMessage = "FALSE POSITIVE"
-        elseif localTrialData.failedState == false then
-            localTrialData.failedState = true
-            localTrialData.mistakeMessage = "Touched the invisible hitbox"
+    -- Wait about half a second after the jump to confirm
+    if localTrialData.currentMove >= 7 then
+        if localTrialData.frameCounter >= 32 then
+            local enteredRoom = (mainmemory.read_u16_le(0x1375AC) <= 1467)
+            local cameraUnlocked = (mainmemory.read_u8(0x0730C1) == 0)
+            if enteredRoom and cameraUnlocked then
+                if localTrialData.failedState == true then
+                    console.log("FALSE NEGATIVE")
+                else
+                    localTrialData.moves[#localTrialData.moves].completed = true
+                    localTrialData.currentMove = #localTrialData.moves + 1
+                    if localTrialData.successState ~= true then
+                        console.log("Override: SUCCESS "..localTrialData.frameCounter)
+                    end
+                    localTrialData.successState = true
+                end
+            else
+                if localTrialData.successState == true then
+                    console.log("FALSE POSITIVE")
+                elseif localTrialData.failedState == false then
+                    if localTrialData.failedState ~= true then
+                        console.log("Override: FAILED "..localTrialData.frameCounter)
+                    end
+                    localTrialData.failedState = true
+                    localTrialData.mistakeMessage = "Touched the invisible hitbox"
+                end
+            end
         end
     end
 
