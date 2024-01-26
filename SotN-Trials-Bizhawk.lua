@@ -682,7 +682,7 @@ local function alucardTrialRichterSkip(passedTrialData)
                         },
                         {
                             button = mnemonics.Jump,
-                            failMessage = "Jumped too early!"
+                            failMessage = "Jumped exactly 1 frame too soon"
                         },
                     },
                     counter = true,
@@ -755,18 +755,12 @@ local function alucardTrialRichterSkip(passedTrialData)
                 else
                     localTrialData.moves[#localTrialData.moves].completed = true
                     localTrialData.currentMove = #localTrialData.moves + 1
-                    if localTrialData.successState ~= true then
-                        console.log("Override: SUCCESS "..localTrialData.frameCounter)
-                    end
                     localTrialData.successState = true
                 end
             else
                 if localTrialData.successState == true then
                     console.log("FALSE POSITIVE")
                 elseif localTrialData.failedState == false then
-                    if localTrialData.failedState ~= true then
-                        console.log("Override: FAILED "..localTrialData.frameCounter)
-                    end
                     localTrialData.failedState = true
                     localTrialData.mistakeMessage = "Touched the invisible hitbox"
                 end
