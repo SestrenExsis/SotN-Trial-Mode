@@ -821,14 +821,13 @@ local function alucardTrialFrontslide(passedTrialData)
             currentMove = 2,
             vars = {
                 diveKickAchieved = false,
+                diveKickHeight = nil,
                 landingAchieved = false,
-                landingVelocityX = nil,
-                landingVelocityY = nil,
                 slidingSpeed = nil
             },
             moves = {
                 {text = "Frontslide:", completed = true},
-                {
+                {    -- 2: first jump
                     images = {constants.buttonImages.cross},
                     description = "jump",
                     buttons = {mnemonics.Jump},
@@ -860,7 +859,7 @@ local function alucardTrialFrontslide(passedTrialData)
                         },
                     },
                     completed = false
-                }, {
+                }, { -- 4: second jump
                     images = {constants.buttonImages.cross},
                     description = "jump",
                     buttons = {mnemonics.Jump},
@@ -892,7 +891,7 @@ local function alucardTrialFrontslide(passedTrialData)
                         },
                     },
                     completed = false
-                }, {
+                }, { -- 6: diagonal divekick
                     images = {constants.buttonImages.downright, constants.buttonImages.cross},
                     description = "diagonal divekick",
                     buttons = {mnemonics.Jump, mnemonics.Down},
@@ -950,10 +949,6 @@ local function alucardTrialFrontslide(passedTrialData)
         return localTrialData
     end
 
-    -- Divekicked from too high up in the air!
-    -- Did not release directions before landing!
-    -- Velocity upon landing not fast enough!
-
     if localTrialData.currentMove <= #localTrialData.moves then
         local currentVelocityX = f32(0x0733E0)
         local currentVelocityY = f32(0x0733E4)
@@ -961,6 +956,7 @@ local function alucardTrialFrontslide(passedTrialData)
         if localTrialData.vars.diveKickAchieved == false then
             if currentVelocityX <= -4.5 or currentVelocityX >= 4.5 then
                 localTrialData.vars.diveKickAchieved = true
+                localTrialData.vars.diveKickHeight = currentYpos
             end
         end
         if localTrialData.moves[localTrialData.currentMove].manualCheck and
@@ -977,10 +973,14 @@ local function alucardTrialFrontslide(passedTrialData)
                     localTrialData.moves[7].completed = false
                     localTrialData.failedState = true
                     localTrialData.mistakeMessage = "Directions not released during slide!"
-                elseif localTrialData.vars.slidingSpeed <= -4.0 or localTrialData.vars.slidingSpeed >= 4.0 then
+                elseif localTrialData.vars.slidingSpeed <= -3.9 or localTrialData.vars.slidingSpeed >= 3.9 then
                     localTrialData.moves[#localTrialData.moves].completed = true
                     localTrialData.currentMove = #localTrialData.moves + 1
                     localTrialData.successState = true
+                elseif localTrialData.vars.diveKickHeight <= 136 then
+                    localTrialData.moves[7].completed = false
+                    localTrialData.failedState = true
+                    localTrialData.mistakeMessage = "Divekicked from too high up in the air!"
                 else
                     localTrialData.moves[7].completed = false
                     localTrialData.failedState = true
@@ -993,8 +993,6 @@ local function alucardTrialFrontslide(passedTrialData)
                     localTrialData.mistakeMessage = "Did not perform a diagonal dive kick!"
                 else
                     localTrialData.vars.landingAchieved = true
-                    localTrialData.vars.landingVelocityX = currentVelocityX
-                    localTrialData.vars.landingVelocityY = currentVelocityY
                 end
             end
         end
