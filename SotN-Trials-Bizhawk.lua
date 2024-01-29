@@ -589,6 +589,20 @@ local function loadSavestate()
     savestate.load(filePath)
 end
 
+local function f32(start)
+    local a = mainmemory.readbyte(start + 3)
+    local b = mainmemory.readbyte(start + 2)
+    local c = mainmemory.readbyte(start + 1)
+    local d = mainmemory.readbyte(start)
+    local result = 0
+    if (a & 0x80) > 0 then
+        result = ((a << 0x08) + b + (c / 0x100) + (d / 0x10000)) - 0x10000
+    else
+        result = (a << 0x08) + b + (c / 0x100) + ((0x7F & d) / 0x10000)
+    end
+    return result
+end
+
 -------------------
 --Trial Functions--
 ------Alucard------
@@ -805,88 +819,185 @@ local function alucardTrialFrontslide(passedTrialData)
             resetState = false,
             mistakeMessage = "",
             currentMove = 2,
-            groundedFramesAfterDive = 0,
+            vars = {
+                diveKickAchieved = false,
+                landingAchieved = false,
+                landingVelocityX = nil,
+                landingVelocityY = nil,
+                slidingSpeed = nil
+            },
             moves = {
-                {text = "Frontslide:", completed = true}, {
+                {text = "Frontslide:", completed = true},
+                {
                     images = {constants.buttonImages.cross},
                     description = "jump",
-                    completed = false,
                     buttons = {mnemonics.Jump},
-                    counter = false
+                    counter = false,
+                    failButtons = {
+                        {
+                            button = mnemonics.Wolf,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                        {
+                            button = mnemonics.Bat,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                    },
+                    completed = false
                 }, {
                     skipDrawing = true,
                     text = nil,
-                    completed = false,
                     buttonsUp = {mnemonics.Jump},
-                    counter = false
+                    counter = false,
+                    failButtons = {
+                        {
+                            button = mnemonics.Wolf,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                        {
+                            button = mnemonics.Bat,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                    },
+                    completed = false
                 }, {
                     images = {constants.buttonImages.cross},
                     description = "jump",
-                    completed = false,
                     buttons = {mnemonics.Jump},
-                    counter = false
+                    counter = false,
+                    failButtons = {
+                        {
+                            button = mnemonics.Wolf,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                        {
+                            button = mnemonics.Bat,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                    },
+                    completed = false
                 }, {
                     skipDrawing = true,
                     text = nil,
-                    completed = false,
                     buttonsUp = {mnemonics.Jump},
-                    counter = false
+                    counter = false,
+                    failButtons = {
+                        {
+                            button = mnemonics.Wolf,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                        {
+                            button = mnemonics.Bat,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                    },
+                    completed = false
                 }, {
                     images = {constants.buttonImages.downright, constants.buttonImages.cross},
                     description = "diagonal divekick",
-                    completed = false,
                     buttons = {mnemonics.Jump, mnemonics.Down},
                     buttonsOr = {mnemonics.Left, mnemonics.Right},
                     counter = true,
-                    frameWindow = 13
+                    failButtons = {
+                        {
+                            button = mnemonics.Wolf,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                        {
+                            button = mnemonics.Bat,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                    },
+                    frameWindow = 13,
+                    completed = false
                 }, {
                     text = "neutral",
+                    buttonsUp = {mnemonics.Jump, mnemonics.Down},
+                    counter = false,
+                    failButtons = {
+                        {
+                            button = mnemonics.Wolf,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                        {
+                            button = mnemonics.Bat,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                    },
+                    frameWindow = 13,
+                    completed = false
+                }, {
+                    skipDrawing = true,
                     manualCheck = true,
                     completed = false,
-                    counter = false
+                    counter = true
                 }
+            },
+            demoInputs = {
+                { duration = 3, buttons = { mnemonics.Jump } },
+                { duration = 3, buttons = {  } },
+                { duration = 3, buttons = { mnemonics.Jump } },
+                { duration = 3, buttons = {  } },
+                { duration = 3, buttons = { mnemonics.Down, mnemonics.Right, mnemonics.Jump } },
+                { duration = 60, buttons = {  } },
             }
         }
     end
 
-    local currentXpos = mainmemory.read_u16_le(constants.memoryData.characterXpos)
-    local currentYpos = mainmemory.read_u16_le(constants.memoryData.characterYpos)
     local inputs = joypad.get()
-
     trialCommon(localTrialData, inputs)
     if localTrialData.moves == nil then
         return localTrialData
     end
 
-    if localTrialData.failedState == false and localTrialData.successState == false and localTrialData.moves[6].completed and currentYpos < 136 then
-        localTrialData.moves[6].completed = false
-        localTrialData.failedState = true
-        localTrialData.mistakeMessage = "Divekicked from too high up in the air!"
-    end
+    -- Divekicked from too high up in the air!
+    -- Did not release directions before landing!
+    -- Velocity upon landing not fast enough!
 
-    if localTrialData.failedState == false and localTrialData.successState == false and localTrialData.moves[6].completed and currentYpos == 167 then
-        localTrialData.groundedFramesAfterDive = localTrialData.groundedFramesAfterDive + 1
-    end
-
-    if localTrialData.failedState == false and localTrialData.successState == false and localTrialData.moves[6].completed and localTrialData.groundedFramesAfterDive > 4 then
-        if inputs[mnemonics.Left] or inputs[mnemonics.Right] or inputs[mnemonics.Down] then
-            localTrialData.moves[7].completed = false
-            localTrialData.failedState = true
-            localTrialData.mistakeMessage = "Did not release directions before landing!"
-        else
-            localTrialData.moves[7].completed = true
-            localTrialData.successState = true
+    if localTrialData.currentMove <= #localTrialData.moves then
+        local currentVelocityX = f32(0x0733E0)
+        local currentVelocityY = f32(0x0733E4)
+        local currentYpos = mainmemory.read_u16_le(constants.memoryData.characterYpos)
+        if localTrialData.vars.diveKickAchieved == false then
+            if currentVelocityX <= -4.5 or currentVelocityX >= 4.5 then
+                localTrialData.vars.diveKickAchieved = true
+            end
         end
-    end
-
-    if currentXpos > 400 then
-        mainmemory.write_u16_le(constants.memoryData.characterXpos,
-                                100 + (400 - currentXpos))
-        currentXpos = 100 + (400 - currentXpos)
-    elseif currentXpos < 100 then
-        mainmemory.write_u16_le(constants.memoryData.characterXpos,
-                                400 - (100 - currentXpos))
-        currentXpos = 400 - (100 - currentXpos)
+        if localTrialData.moves[localTrialData.currentMove].manualCheck and
+            localTrialData.successState == false and
+            localTrialData.failedState == false
+        then
+            if localTrialData.vars.landingAchieved then
+                localTrialData.vars.slidingSpeed = currentVelocityX
+                console.log("slidingSpeed = "..localTrialData.vars.slidingSpeed)
+                if inputs[mnemonics.Left] or
+                    inputs[mnemonics.Right] or
+                    inputs[mnemonics.Down]
+                then
+                    localTrialData.moves[7].completed = false
+                    localTrialData.failedState = true
+                    localTrialData.mistakeMessage = "Directions not released during slide!"
+                elseif localTrialData.vars.slidingSpeed <= -4.0 or localTrialData.vars.slidingSpeed >= 4.0 then
+                    localTrialData.moves[#localTrialData.moves].completed = true
+                    localTrialData.currentMove = #localTrialData.moves + 1
+                    localTrialData.successState = true
+                else
+                    localTrialData.moves[7].completed = false
+                    localTrialData.failedState = true
+                    localTrialData.mistakeMessage = "Insufficient slide speed!"
+                end
+            elseif currentYpos >= 167 and localTrialData.vars.landingAchieved == false then
+                if localTrialData.vars.diveKickAchieved == false then
+                    localTrialData.moves[7].completed = false
+                    localTrialData.failedState = true
+                    localTrialData.mistakeMessage = "Did not perform a diagonal dive kick!"
+                else
+                    localTrialData.vars.landingAchieved = true
+                    localTrialData.vars.landingVelocityX = currentVelocityX
+                    localTrialData.vars.landingVelocityY = currentVelocityY
+                end
+            end
+        end
     end
 
     if localTrialData.failedState and localTrialData.frameCounter > 160 then
