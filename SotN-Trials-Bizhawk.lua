@@ -965,7 +965,6 @@ local function alucardTrialFrontslide(passedTrialData)
         then
             if localTrialData.vars.landingAchieved then
                 localTrialData.vars.slidingSpeed = currentVelocityX
-                console.log("slidingSpeed = "..localTrialData.vars.slidingSpeed)
                 if inputs[mnemonics.Left] or
                     inputs[mnemonics.Right] or
                     inputs[mnemonics.Down]
@@ -1293,8 +1292,7 @@ end
 
 local function alucardChallengeShieldDashSpeed(passedTrialData)
     local localTrialData = passedTrialData
-    local currentXpos = mainmemory.read_u16_le(
-                            constants.memoryData.characterXpos)
+    local currentXpos = mainmemory.read_u16_le(constants.memoryData.characterXpos)
     if localTrialData.moves == nil then
         loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
@@ -1334,28 +1332,28 @@ local function alucardChallengeShieldDashSpeed(passedTrialData)
     local averageSpeed = 0;
 
     if localTrialData.pixelsTraveledPerFrame.last -
-        localTrialData.pixelsTraveledPerFrame.first < 60 then
-        localTrialData.pixelsTraveledPerSecond =
-            localTrialData.pixelsTraveledPerSecond + pixelsTraveled
+        localTrialData.pixelsTraveledPerFrame.first < 60
+    then
+        localTrialData.pixelsTraveledPerSecond = localTrialData.pixelsTraveledPerSecond + pixelsTraveled
         List.pushright(localTrialData.pixelsTraveledPerFrame, pixelsTraveled)
     else
-        localTrialData.pixelsTraveledPerSecond =
-            localTrialData.pixelsTraveledPerSecond + pixelsTraveled
-        localTrialData.pixelsTraveledPerSecond =
-            localTrialData.pixelsTraveledPerSecond -
-                List.popleft(localTrialData.pixelsTraveledPerFrame)
+        localTrialData.pixelsTraveledPerSecond = localTrialData.pixelsTraveledPerSecond + pixelsTraveled
+        localTrialData.pixelsTraveledPerSecond = localTrialData.pixelsTraveledPerSecond - List.popleft(localTrialData.pixelsTraveledPerFrame)
         List.pushright(localTrialData.pixelsTraveledPerFrame, pixelsTraveled)
         averageSpeed = math.abs((localTrialData.pixelsTraveledPerSecond) / 60)
         --display speed
         customMessageDisplay(0, "average speed: " .. string.format("%2.2f", averageSpeed))
     end
 
+    local roomStart = 19 * 16 + 4
+    local roomWidth = 2 * (8 * 16)
+    local roomEnd = roomStart + roomWidth
     --create infinite room by wrapping x position
-    if currentXpos > 991 then
-        currentXpos = 384 + (currentXpos - 991)
+    if currentXpos > roomEnd then
+        currentXpos = roomStart + (currentXpos - roomEnd)
         mainmemory.write_u16_le(constants.memoryData.characterXpos, currentXpos)
-    elseif currentXpos < 384 then
-        currentXpos = 991 - (384 - currentXpos)
+    elseif currentXpos < roomStart then
+        currentXpos = roomEnd - (roomStart - currentXpos)
         mainmemory.write_u16_le(constants.memoryData.characterXpos, currentXpos)
     end
 
