@@ -438,7 +438,7 @@ local function runDemo(localTrialData)
     local inputsToSet = {}
 
     --skip challenges
-    if commonVariables.currentTrial == 4 or commonVariables.currentTrial == 5 then
+    if commonVariables.currentTrial == 5 or commonVariables.currentTrial == 6 then
         return
     end
 
@@ -587,6 +587,20 @@ local function loadSavestate()
     local fileName = constants.savestates[commonVariables.currentTrial]
     local filePath = "states/"..fileName.." "..getVersion()..".State"
     savestate.load(filePath)
+end
+
+local function f32(start)
+    local a = mainmemory.readbyte(start + 3)
+    local b = mainmemory.readbyte(start + 2)
+    local c = mainmemory.readbyte(start + 1)
+    local d = mainmemory.readbyte(start)
+    local result = 0
+    if (a & 0x80) > 0 then
+        result = ((a << 0x08) + b + (c / 0x100) + (d / 0x10000)) - 0x10000
+    else
+        result = (a << 0x08) + b + (c / 0x100) + ((0x7F & d) / 0x10000)
+    end
+    return result
 end
 
 -------------------
@@ -805,89 +819,189 @@ local function alucardTrialFrontslide(passedTrialData)
             resetState = false,
             mistakeMessage = "",
             currentMove = 2,
-            groundedFramesAfterDive = 0,
+            vars = {
+                diveKickAchieved = false,
+                diveKickHeight = nil,
+                landingAchieved = false,
+                slidingSpeed = nil
+            },
             moves = {
-                {text = "Frontslide:", completed = true}, {
+                {text = "Frontslide:", completed = true},
+                {    -- 2: first jump
                     images = {constants.buttonImages.cross},
                     description = "jump",
-                    completed = false,
                     buttons = {mnemonics.Jump},
-                    counter = false
+                    counter = false,
+                    failButtons = {
+                        {
+                            button = mnemonics.Wolf,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                        {
+                            button = mnemonics.Bat,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                    },
+                    completed = false
                 }, {
                     skipDrawing = true,
                     text = nil,
-                    completed = false,
                     buttonsUp = {mnemonics.Jump},
-                    counter = false
-                }, {
+                    counter = false,
+                    failButtons = {
+                        {
+                            button = mnemonics.Wolf,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                        {
+                            button = mnemonics.Bat,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                    },
+                    completed = false
+                }, { -- 4: second jump
                     images = {constants.buttonImages.cross},
                     description = "jump",
-                    completed = false,
                     buttons = {mnemonics.Jump},
-                    counter = false
+                    counter = false,
+                    failButtons = {
+                        {
+                            button = mnemonics.Wolf,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                        {
+                            button = mnemonics.Bat,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                    },
+                    completed = false
                 }, {
                     skipDrawing = true,
                     text = nil,
-                    completed = false,
                     buttonsUp = {mnemonics.Jump},
-                    counter = false
-                }, {
+                    counter = false,
+                    failButtons = {
+                        {
+                            button = mnemonics.Wolf,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                        {
+                            button = mnemonics.Bat,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                    },
+                    completed = false
+                }, { -- 6: diagonal divekick
                     images = {constants.buttonImages.downright, constants.buttonImages.cross},
                     description = "diagonal divekick",
-                    completed = false,
                     buttons = {mnemonics.Jump, mnemonics.Down},
                     buttonsOr = {mnemonics.Left, mnemonics.Right},
                     counter = true,
-                    frameWindow = 13
+                    failButtons = {
+                        {
+                            button = mnemonics.Wolf,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                        {
+                            button = mnemonics.Bat,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                    },
+                    frameWindow = 13,
+                    completed = false
                 }, {
                     text = "neutral",
+                    buttonsUp = {mnemonics.Jump, mnemonics.Down},
+                    counter = false,
+                    failButtons = {
+                        {
+                            button = mnemonics.Wolf,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                        {
+                            button = mnemonics.Bat,
+                            failMessage = "Must be in Alucard form!"
+                        },
+                    },
+                    frameWindow = 13,
+                    completed = false
+                }, {
+                    skipDrawing = true,
                     manualCheck = true,
                     completed = false,
-                    counter = false
+                    counter = true
                 }
+            },
+            demoInputs = {
+                { duration = 3, buttons = { mnemonics.Jump } },
+                { duration = 3, buttons = {  } },
+                { duration = 3, buttons = { mnemonics.Jump } },
+                { duration = 3, buttons = {  } },
+                { duration = 3, buttons = { mnemonics.Down, mnemonics.Right, mnemonics.Jump } },
+                { duration = 60, buttons = {  } },
             }
         }
     end
+    
+    --run common trial functionality including standard input checks
 
-    local currentXpos = mainmemory.read_u16_le(constants.memoryData.characterXpos)
-    local currentYpos = mainmemory.read_u16_le(constants.memoryData.characterYpos)
     local inputs = joypad.get()
-
     trialCommon(localTrialData, inputs)
     if localTrialData.moves == nil then
         return localTrialData
     end
 
-    if localTrialData.failedState == false and localTrialData.successState == false and localTrialData.moves[6].completed and currentYpos < 136 then
-        localTrialData.moves[6].completed = false
-        localTrialData.failedState = true
-        localTrialData.mistakeMessage = "Divekicked from too high up in the air!"
-    end
+    --special case checks would go here
 
-    if localTrialData.failedState == false and localTrialData.successState == false and localTrialData.moves[6].completed and currentYpos == 167 then
-        localTrialData.groundedFramesAfterDive = localTrialData.groundedFramesAfterDive + 1
-    end
-
-    if localTrialData.failedState == false and localTrialData.successState == false and localTrialData.moves[6].completed and localTrialData.groundedFramesAfterDive > 4 then
-        if inputs[mnemonics.Left] or inputs[mnemonics.Right] or inputs[mnemonics.Down] then
-            localTrialData.moves[7].completed = false
-            localTrialData.failedState = true
-            localTrialData.mistakeMessage = "Did not release directions before landing!"
-        else
-            localTrialData.moves[7].completed = true
-            localTrialData.successState = true
+    if localTrialData.currentMove <= #localTrialData.moves then
+        local currentVelocityX = f32(0x0733E0)
+        local currentVelocityY = f32(0x0733E4)
+        local currentYpos = mainmemory.read_u16_le(constants.memoryData.characterYpos)
+        if localTrialData.vars.diveKickAchieved == false then
+            if currentVelocityX <= -4.5 or currentVelocityX >= 4.5 then
+                localTrialData.vars.diveKickAchieved = true
+                localTrialData.vars.diveKickHeight = currentYpos
+            end
+        end
+        if localTrialData.moves[localTrialData.currentMove].manualCheck and
+            localTrialData.successState == false and
+            localTrialData.failedState == false
+        then
+            if localTrialData.vars.landingAchieved then
+                localTrialData.vars.slidingSpeed = currentVelocityX
+                if inputs[mnemonics.Left] or
+                    inputs[mnemonics.Right] or
+                    inputs[mnemonics.Down]
+                then
+                    localTrialData.moves[7].completed = false
+                    localTrialData.failedState = true
+                    localTrialData.mistakeMessage = "Directions not released during slide!"
+                elseif localTrialData.vars.slidingSpeed <= -3.9 or localTrialData.vars.slidingSpeed >= 3.9 then
+                    localTrialData.moves[#localTrialData.moves].completed = true
+                    localTrialData.currentMove = #localTrialData.moves + 1
+                    localTrialData.successState = true
+                elseif localTrialData.vars.diveKickHeight <= 136 then
+                    localTrialData.moves[7].completed = false
+                    localTrialData.failedState = true
+                    localTrialData.mistakeMessage = "Divekicked from too high up in the air!"
+                else
+                    localTrialData.moves[7].completed = false
+                    localTrialData.failedState = true
+                    localTrialData.mistakeMessage = "Insufficient slide speed!"
+                end
+            elseif currentYpos >= 167 and localTrialData.vars.landingAchieved == false then
+                if localTrialData.vars.diveKickAchieved == false then
+                    localTrialData.moves[7].completed = false
+                    localTrialData.failedState = true
+                    localTrialData.mistakeMessage = "Did not perform a diagonal dive kick!"
+                else
+                    localTrialData.vars.landingAchieved = true
+                end
+            end
         end
     end
 
-    if currentXpos > 400 then
-        mainmemory.write_u16_le(constants.memoryData.characterXpos,
-                                100 + (400 - currentXpos))
-        currentXpos = 100 + (400 - currentXpos)
-    elseif currentXpos < 100 then
-        mainmemory.write_u16_le(constants.memoryData.characterXpos,
-                                400 - (100 - currentXpos))
-        currentXpos = 400 - (100 - currentXpos)
-    end
+    --returning an empty table restarts the trial
 
     if localTrialData.failedState and localTrialData.frameCounter > 160 then
         return {}
@@ -902,6 +1016,8 @@ local function alucardTrialFrontslide(passedTrialData)
         end
         return {}
     end
+
+    --returning an empty table restarts the trial
 
     if localTrialData.resetState then
         return {}
@@ -933,7 +1049,7 @@ local function alucardTrialAutodash(passedTrialData)
                     text = "(hold)",
                     description = "Left(hold)",
                     completed = false,
-                    buttons = { mnemonics.Left },
+                    buttons = { mnemonics.Mist, mnemonics.Left },
                     failButtons = {
                         {
                             button = mnemonics.Right,
@@ -945,13 +1061,8 @@ local function alucardTrialAutodash(passedTrialData)
                     images = {constants.buttonImages.l1},
                     description = "Mist",
                     completed = false,
-                    buttons = {mnemonics.Mist, mnemonics.Left},
                     buttonsHold = {mnemonics.Left},
                     failButtons = {
-                        {
-                            button = mnemonics.Right,
-                            failMessage = "Must be next to ledge!"
-                        },
                         {
                             button = mnemonics.Right,
                             failMessage = "Must be next to ledge!"
@@ -984,8 +1095,8 @@ local function alucardTrialAutodash(passedTrialData)
                         },
                     },
                     counter = true,
-                    frameWindow = 7,
-                    minimumGap = 6
+                    frameWindow = 8,
+                    minimumGap = 5
                 }, {
                     images = {constants.buttonImages.left},
                     text = "(hold)",
@@ -993,11 +1104,24 @@ local function alucardTrialAutodash(passedTrialData)
                     completed = false,
                     buttonsHold = {mnemonics.Left},
                     counter = true,
-                    holdDuration = 70
+                    holdDuration = 60
+                }, {
+                    skipDrawing = true,
+                    manualCheck = true,
+                    completed = false,
+                    counter = true
                 }
+            },
+            demoInputs = {
+                { duration = 3, buttons = { mnemonics.Left } },
+                { duration = 3, buttons = { mnemonics.Left, mnemonics.Mist } },
+                { duration = 3, buttons = { mnemonics.Left } },
+                { duration = 3, buttons = { mnemonics.Left, mnemonics.Wolf } },
+                { duration = 90, buttons = { mnemonics.Left } },
             }
         }
     end
+
     --run common trial functionality including standard input checks
     local inputs = joypad.get()
     trialCommon(localTrialData, inputs)
@@ -1006,6 +1130,29 @@ local function alucardTrialAutodash(passedTrialData)
     end
 
     --special case checks would go here
+
+    if localTrialData.currentMove <= #localTrialData.moves then
+        if localTrialData.moves[localTrialData.currentMove].manualCheck and
+            localTrialData.successState == false and
+            localTrialData.failedState == false
+        then
+            -- Goal is to have an x-velocity of -3 while x-position <= 142 and y-position < 839
+            local currentXpos = mainmemory.read_u16_le(constants.memoryData.characterXpos)
+            local currentYpos = mainmemory.read_u16_le(constants.memoryData.characterYpos)
+            if currentXpos <= 142 and currentYpos < 839 then
+                local currentVelocityX = f32(0x0733E0)
+                if currentVelocityX <= -3.0 then
+                    localTrialData.moves[#localTrialData.moves].completed = true
+                    localTrialData.currentMove = #localTrialData.moves + 1
+                    localTrialData.successState = true
+                else
+                    localTrialData.moves[6].completed = false
+                    localTrialData.failedState = true
+                    localTrialData.mistakeMessage = "Failed to achieve an autodash!"
+                end
+            end
+        end
+    end
 
     --returning an empty table restarts the trial
     if localTrialData.failedState and localTrialData.frameCounter > 160 then
@@ -1042,12 +1189,14 @@ local function alucardTrialFloorClip(passedTrialData)
             failedState = false,
             successState = false,
             resetState = false,
-            autodashState = false,
-            goodJump = false,
             mistakeMessage = "",
             currentMove = 2,
+            vars = {
+                goodJump = false,
+                autoDash = false
+            },
             moves = {
-                {text = "Floor CLip:", completed = true}, {
+                {text = "Floor Clip:", completed = true}, {
                     images = {constants.buttonImages.left},
                     text = "(hold)",
                     description = "Left(hold)",
@@ -1088,7 +1237,7 @@ local function alucardTrialFloorClip(passedTrialData)
                     description = "wolf(after 5 or 6 frames)",
                     completed = false,
                     buttons = {mnemonics.Wolf},
-                    buttonsHold = {mnemonics.Left, mnemonics.Mist},
+                    buttonsHold = {mnemonics.Left},
                     failButtons = {
                         {
                             button = mnemonics.Bat,
@@ -1101,7 +1250,7 @@ local function alucardTrialFloorClip(passedTrialData)
                     },
                     counter = true,
                     frameWindow = 7,
-                    minimumGap = 6 -- correctly executed first frame autodash showing up as 1 frame too early wolf press
+                    minimumGap = 6
                 }, {
                     images = {constants.buttonImages.cross},
                     description = "jump",
@@ -1127,6 +1276,19 @@ local function alucardTrialFloorClip(passedTrialData)
                     frameWindow = 13,
                     minimumGap = 13
                 },
+            },
+            demoInputs = {
+                -- BAD JUMP FRAME:                   3, 3, 3, 3, 60, 3, 10, 3
+                -- GOOD JUMP FRAME, EARLY TRANSFORM: 3, 3, 4, 3, 60, 3,  9, 3
+                -- GOOD JUMP FRAME, LATE TRANSFORM:  3, 3, 4, 3, 60, 3, 10, 3
+                { duration = 3, buttons = { mnemonics.Left } },
+                { duration = 3, buttons = { mnemonics.Left, mnemonics.Mist } },
+                { duration = 4, buttons = { mnemonics.Left } },
+                { duration = 3, buttons = { mnemonics.Left, mnemonics.Wolf } },
+                { duration = 60, buttons = { mnemonics.Left } },
+                { duration = 3, buttons = { mnemonics.Left, mnemonics.Jump } },
+                { duration = 10, buttons = { mnemonics.Left } },
+                { duration = 3, buttons = { mnemonics.Left, mnemonics.Wolf } },
             }
         }
     end
@@ -1138,24 +1300,17 @@ local function alucardTrialFloorClip(passedTrialData)
         return localTrialData
     end
 
-    --[[   manna prism adjustment
-    if localTrialData.currentMove == 4 then
-        localTrialData.moves[6].minimumGap = localTrialData.moves[6].minimumGap + 1
-        localTrialData.moves[6].frameWindow = localTrialData.moves[6].frameWindow + 1
-    end
-    ]]
-
     -- adjustment for good jump frame
-    if localTrialData.currentMove == 5 and localTrialData.autodashState == false then
-        localTrialData.autodashState = true
+    if localTrialData.currentMove == 5 and localTrialData.vars.autoDash == false then
+        localTrialData.vars.autoDash = true
         local subpixelValue = mainmemory.readbyte(constants.memoryData.subpixelValue)
         if subpixelValue == 0 then
             localTrialData.moves[6].minimumGap = localTrialData.moves[6].minimumGap - 1
-            localTrialData.goodJump = true
+            localTrialData.vars.goodJump = true
         end
     end
 
-    if localTrialData.goodJump then
+    if localTrialData.vars.goodJump then
         customMessageDisplay(1, "good jump frame")
     end
 
@@ -1184,8 +1339,7 @@ end
 
 local function alucardChallengeShieldDashSpeed(passedTrialData)
     local localTrialData = passedTrialData
-    local currentXpos = mainmemory.read_u16_le(
-                            constants.memoryData.characterXpos)
+    local currentXpos = mainmemory.read_u16_le(constants.memoryData.characterXpos)
     if localTrialData.moves == nil then
         loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
@@ -1225,28 +1379,28 @@ local function alucardChallengeShieldDashSpeed(passedTrialData)
     local averageSpeed = 0;
 
     if localTrialData.pixelsTraveledPerFrame.last -
-        localTrialData.pixelsTraveledPerFrame.first < 60 then
-        localTrialData.pixelsTraveledPerSecond =
-            localTrialData.pixelsTraveledPerSecond + pixelsTraveled
+        localTrialData.pixelsTraveledPerFrame.first < 60
+    then
+        localTrialData.pixelsTraveledPerSecond = localTrialData.pixelsTraveledPerSecond + pixelsTraveled
         List.pushright(localTrialData.pixelsTraveledPerFrame, pixelsTraveled)
     else
-        localTrialData.pixelsTraveledPerSecond =
-            localTrialData.pixelsTraveledPerSecond + pixelsTraveled
-        localTrialData.pixelsTraveledPerSecond =
-            localTrialData.pixelsTraveledPerSecond -
-                List.popleft(localTrialData.pixelsTraveledPerFrame)
+        localTrialData.pixelsTraveledPerSecond = localTrialData.pixelsTraveledPerSecond + pixelsTraveled
+        localTrialData.pixelsTraveledPerSecond = localTrialData.pixelsTraveledPerSecond - List.popleft(localTrialData.pixelsTraveledPerFrame)
         List.pushright(localTrialData.pixelsTraveledPerFrame, pixelsTraveled)
         averageSpeed = math.abs((localTrialData.pixelsTraveledPerSecond) / 60)
         --display speed
         customMessageDisplay(0, "average speed: " .. string.format("%2.2f", averageSpeed))
     end
 
+    local roomStart = 19 * 16 + 4
+    local roomWidth = 2 * (8 * 16)
+    local roomEnd = roomStart + roomWidth
     --create infinite room by wrapping x position
-    if currentXpos > 991 then
-        currentXpos = 384 + (currentXpos - 991)
+    if currentXpos > roomEnd then
+        currentXpos = roomStart + (currentXpos - roomEnd)
         mainmemory.write_u16_le(constants.memoryData.characterXpos, currentXpos)
-    elseif currentXpos < 384 then
-        currentXpos = 991 - (384 - currentXpos)
+    elseif currentXpos < roomStart then
+        currentXpos = roomEnd - (roomStart - currentXpos)
         mainmemory.write_u16_le(constants.memoryData.characterXpos, currentXpos)
     end
 

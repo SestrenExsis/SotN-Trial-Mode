@@ -6,6 +6,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
     forms.setproperty(guiForm.interfaceCheckboxContinue, "Checked", settings.autoContinue)
     guiForm.interfaceCheckboxRendering = forms.checkbox(guiForm.mainForm, "Rendering mode PixelPro", 10, 50)
     forms.setproperty(guiForm.interfaceCheckboxRendering, "Checked", settings.renderPixelPro)
+    -- Alucard Trials
     forms.label(guiForm.mainForm, "Alucard Trials:", 10, 80, 220, 20)
     guiForm.alucardTrialRichterSkipButton = forms.button(guiForm.mainForm, "Richter Skip   cleared:" .. saveData["alucardTrialRichterSkip"], function(x)
         commonVariables.trialData = {}
@@ -23,6 +24,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
         commonVariables.trialData = {}
         commonVariables.currentTrial = 4
     end, 10, 168, 200, 20)
+    -- Alucard Challenges
     forms.label(guiForm.mainForm, "Alucard Challenges:", 10, 190, 220, 20)
     guiForm.alucardChallengeShieldDashSpeedButton = forms.button(guiForm.mainForm, "ShieldDashing avg spd   cleared:" .. saveData["alucardChallengeShieldDashSpeed"], function(x)
         commonVariables.trialData = {}
@@ -40,6 +42,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
         commonVariables.trialData = {}
         commonVariables.currentTrial = 1
     end, 10, 278, 200, 20)
+    -- Richter Trials
     forms.label(guiForm.mainForm, "Richter Trials:", 10, 300, 220, 20)
     guiForm.richterTrialSlidingAirslashButton = forms.button(guiForm.mainForm, "Sliding Airslash   cleared:" .. saveData["richterTrialSlidingAirslash"], function(x)
         commonVariables.trialData.moves = nil
@@ -57,6 +60,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
         commonVariables.trialData = {}
         commonVariables.currentTrial = 1
     end, 10, 390, 200, 20)
+    -- Richter Challenges
     forms.label(guiForm.mainForm, "Richter Challenges:", 10, 412, 220, 20)
     guiForm.richterChallengeMinotaurRoomTimeTrialButton = forms.button(guiForm.mainForm, "Minotaur Room   cleared:"  .. saveData["richterChallengeMinotaurRoomTimeTrial"], function(x)
         commonVariables.trialData = {}
@@ -81,16 +85,19 @@ function initForm(commonVariables, saveData, guiForm, settings)
     forms.setproperty(guiForm.interfaceCheckboxRendering, "Width", 200)
 end
 function updateForm(saveData, guiForm)
+    -- Alucard Trials
     forms.settext(guiForm.alucardTrialRichterSkipButton,  "Richter Skip   cleared:" .. saveData["alucardTrialRichterSkip"])
-    forms.settext(guiForm.alucardTrialAutodashButton,  "Autodash   cleared:" .. saveData["alucardTrialAutodash"])
     forms.settext(guiForm.alucardTrialFrontslideButton,  "Frontslide   cleared:" .. saveData["alucardTrialFrontslide"])
     forms.settext(guiForm.alucardTrialAutodashButton,  "Autodash   cleared:" .. saveData["alucardTrialAutodash"])
     forms.settext(guiForm.alucardTrialFloorClipButton,  "Floor Clip   cleared:" .. saveData["alucardTrialFloorClip"])
+    -- Alucard Challenges
     forms.settext(guiForm.alucardChallengeShieldDashSpeedButton,  "Shield Dashing average speed   cleared:" .. saveData["alucardChallengeShieldDashSpeed"])
     forms.settext(guiForm.alucardChallengeForceOfEchoTimeTrialButton,  "Force of Echo time trial   cleared:" .. saveData["alucardChallengeForceOfEchoTimeTrial"])
+    -- Richter Trials
     forms.settext(guiForm.richterTrialSlidingAirslashButton,  "Sliding Airslash   cleared:" .. saveData["richterTrialSlidingAirslash"])
     forms.settext(guiForm.richterTrialVaultingAirslashButton,  "Vaulting Airslash   cleared:" .. saveData["richterTrialVaultingAirslash"])
     forms.settext(guiForm.richterTrialOtgAirslashButton,  "Otg Airslash   cleared:" .. saveData["richterTrialOtgAirslash"])
+    -- Richter Challenges
     forms.settext(guiForm.richterChallengeMinotaurRoomTimeTrialButton,  "Minotaur Room   cleared:" .. saveData["richterChallengeMinotaurRoomTimeTrial"])
 end
 
