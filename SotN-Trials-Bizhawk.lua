@@ -1189,12 +1189,14 @@ local function alucardTrialFloorClip(passedTrialData)
             failedState = false,
             successState = false,
             resetState = false,
-            autodashState = false,
-            goodJump = false,
             mistakeMessage = "",
             currentMove = 2,
+            vars = {
+                goodJump = false,
+                autoDash = false
+            },
             moves = {
-                {text = "Floor CLip:", completed = true}, {
+                {text = "Floor Clip:", completed = true}, {
                     images = {constants.buttonImages.left},
                     text = "(hold)",
                     description = "Left(hold)",
@@ -1235,7 +1237,7 @@ local function alucardTrialFloorClip(passedTrialData)
                     description = "wolf(after 5 or 6 frames)",
                     completed = false,
                     buttons = {mnemonics.Wolf},
-                    buttonsHold = {mnemonics.Left, mnemonics.Mist},
+                    buttonsHold = {mnemonics.Left},
                     failButtons = {
                         {
                             button = mnemonics.Bat,
@@ -1248,7 +1250,7 @@ local function alucardTrialFloorClip(passedTrialData)
                     },
                     counter = true,
                     frameWindow = 7,
-                    minimumGap = 6 -- correctly executed first frame autodash showing up as 1 frame too early wolf press
+                    minimumGap = 6
                 }, {
                     images = {constants.buttonImages.cross},
                     description = "jump",
@@ -1276,13 +1278,16 @@ local function alucardTrialFloorClip(passedTrialData)
                 },
             },
             demoInputs = {
+                -- BAD JUMP FRAME:                   3, 3, 3, 3, 60, 3, 10, 3
+                -- GOOD JUMP FRAME, EARLY TRANSFORM: 3, 3, 4, 3, 60, 3,  9, 3
+                -- GOOD JUMP FRAME, LATE TRANSFORM:  3, 3, 4, 3, 60, 3, 10, 3
                 { duration = 3, buttons = { mnemonics.Left } },
                 { duration = 3, buttons = { mnemonics.Left, mnemonics.Mist } },
-                { duration = 3, buttons = { mnemonics.Left } },
+                { duration = 4, buttons = { mnemonics.Left } },
                 { duration = 3, buttons = { mnemonics.Left, mnemonics.Wolf } },
-                { duration = 6, buttons = { mnemonics.Left } },
+                { duration = 60, buttons = { mnemonics.Left } },
                 { duration = 3, buttons = { mnemonics.Left, mnemonics.Jump } },
-                { duration = 6, buttons = { mnemonics.Left } },
+                { duration = 10, buttons = { mnemonics.Left } },
                 { duration = 3, buttons = { mnemonics.Left, mnemonics.Wolf } },
             }
         }
@@ -1295,24 +1300,17 @@ local function alucardTrialFloorClip(passedTrialData)
         return localTrialData
     end
 
-    --[[   manna prism adjustment
-    if localTrialData.currentMove == 4 then
-        localTrialData.moves[6].minimumGap = localTrialData.moves[6].minimumGap + 1
-        localTrialData.moves[6].frameWindow = localTrialData.moves[6].frameWindow + 1
-    end
-    ]]
-
     -- adjustment for good jump frame
-    if localTrialData.currentMove == 5 and localTrialData.autodashState == false then
-        localTrialData.autodashState = true
+    if localTrialData.currentMove == 5 and localTrialData.vars.autoDash == false then
+        localTrialData.vars.autoDash = true
         local subpixelValue = mainmemory.readbyte(constants.memoryData.subpixelValue)
         if subpixelValue == 0 then
             localTrialData.moves[6].minimumGap = localTrialData.moves[6].minimumGap - 1
-            localTrialData.goodJump = true
+            localTrialData.vars.goodJump = true
         end
     end
 
-    if localTrialData.goodJump then
+    if localTrialData.vars.goodJump then
         customMessageDisplay(1, "good jump frame")
     end
 
