@@ -942,12 +942,16 @@ local function alucardTrialFrontslide(passedTrialData)
             }
         }
     end
+    
+    --run common trial functionality including standard input checks
 
     local inputs = joypad.get()
     trialCommon(localTrialData, inputs)
     if localTrialData.moves == nil then
         return localTrialData
     end
+
+    --special case checks would go here
 
     if localTrialData.currentMove <= #localTrialData.moves then
         local currentVelocityX = f32(0x0733E0)
@@ -997,6 +1001,8 @@ local function alucardTrialFrontslide(passedTrialData)
         end
     end
 
+    --returning an empty table restarts the trial
+
     if localTrialData.failedState and localTrialData.frameCounter > 160 then
         return {}
     end
@@ -1010,6 +1016,8 @@ local function alucardTrialFrontslide(passedTrialData)
         end
         return {}
     end
+
+    --returning an empty table restarts the trial
 
     if localTrialData.resetState then
         return {}
@@ -1041,7 +1049,7 @@ local function alucardTrialAutodash(passedTrialData)
                     text = "(hold)",
                     description = "Left(hold)",
                     completed = false,
-                    buttons = { mnemonics.Left },
+                    buttons = { mnemonics.Mist, mnemonics.Left },
                     failButtons = {
                         {
                             button = mnemonics.Right,
@@ -1053,13 +1061,8 @@ local function alucardTrialAutodash(passedTrialData)
                     images = {constants.buttonImages.l1},
                     description = "Mist",
                     completed = false,
-                    buttons = {mnemonics.Mist, mnemonics.Left},
                     buttonsHold = {mnemonics.Left},
                     failButtons = {
-                        {
-                            button = mnemonics.Right,
-                            failMessage = "Must be next to ledge!"
-                        },
                         {
                             button = mnemonics.Right,
                             failMessage = "Must be next to ledge!"
@@ -1092,8 +1095,8 @@ local function alucardTrialAutodash(passedTrialData)
                         },
                     },
                     counter = true,
-                    frameWindow = 7,
-                    minimumGap = 6
+                    frameWindow = 8,
+                    minimumGap = 5
                 }, {
                     images = {constants.buttonImages.left},
                     text = "(hold)",
@@ -1101,11 +1104,24 @@ local function alucardTrialAutodash(passedTrialData)
                     completed = false,
                     buttonsHold = {mnemonics.Left},
                     counter = true,
-                    holdDuration = 70
+                    holdDuration = 60
+                }, {
+                    skipDrawing = true,
+                    manualCheck = true,
+                    completed = false,
+                    counter = true
                 }
+            },
+            demoInputs = {
+                { duration = 3, buttons = { mnemonics.Left } },
+                { duration = 3, buttons = { mnemonics.Left, mnemonics.Mist } },
+                { duration = 3, buttons = { mnemonics.Left } },
+                { duration = 3, buttons = { mnemonics.Left, mnemonics.Wolf } },
+                { duration = 90, buttons = { mnemonics.Left } },
             }
         }
     end
+
     --run common trial functionality including standard input checks
     local inputs = joypad.get()
     trialCommon(localTrialData, inputs)
@@ -1114,6 +1130,29 @@ local function alucardTrialAutodash(passedTrialData)
     end
 
     --special case checks would go here
+    
+    if localTrialData.currentMove <= #localTrialData.moves then
+        if localTrialData.moves[localTrialData.currentMove].manualCheck and
+            localTrialData.successState == false and
+            localTrialData.failedState == false
+        then
+            -- Goal is to have an x-velocity of -3 while x-position <= 142 and y-position < 839
+            local currentXpos = mainmemory.read_u16_le(constants.memoryData.characterXpos)
+            local currentYpos = mainmemory.read_u16_le(constants.memoryData.characterYpos)
+            if currentXpos <= 142 and currentYpos < 839 then
+                local currentVelocityX = f32(0x0733E0)
+                if currentVelocityX <= -3.0 then
+                    localTrialData.moves[#localTrialData.moves].completed = true
+                    localTrialData.currentMove = #localTrialData.moves + 1
+                    localTrialData.successState = true
+                else
+                    localTrialData.moves[6].completed = false
+                    localTrialData.failedState = true
+                    localTrialData.mistakeMessage = "Failed to achieve an autodash!"
+                end
+            end
+        end
+    end
 
     --returning an empty table restarts the trial
     if localTrialData.failedState and localTrialData.frameCounter > 160 then
