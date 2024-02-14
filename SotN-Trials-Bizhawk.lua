@@ -438,7 +438,7 @@ local function runDemo(localTrialData)
     local inputsToSet = {}
 
     --skip challenges
-    if commonVariables.currentTrial == 4 or commonVariables.currentTrial == 5 then
+    if commonVariables.currentTrial == 5 or commonVariables.currentTrial == 6 then
         return
     end
 
@@ -1130,7 +1130,7 @@ local function alucardTrialAutodash(passedTrialData)
     end
 
     --special case checks would go here
-    
+
     if localTrialData.currentMove <= #localTrialData.moves then
         if localTrialData.moves[localTrialData.currentMove].manualCheck and
             localTrialData.successState == false and
@@ -1274,6 +1274,16 @@ local function alucardTrialFloorClip(passedTrialData)
                     frameWindow = 13,
                     minimumGap = 13
                 },
+            },
+            demoInputs = {
+                { duration = 3, buttons = { mnemonics.Left } },
+                { duration = 3, buttons = { mnemonics.Left, mnemonics.Mist } },
+                { duration = 3, buttons = { mnemonics.Left } },
+                { duration = 3, buttons = { mnemonics.Left, mnemonics.Wolf } },
+                { duration = 6, buttons = { mnemonics.Left } },
+                { duration = 3, buttons = { mnemonics.Left, mnemonics.Jump } },
+                { duration = 6, buttons = { mnemonics.Left } },
+                { duration = 3, buttons = { mnemonics.Left, mnemonics.Wolf } },
             }
         }
     end
