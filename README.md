@@ -1,10 +1,14 @@
 # SOTN Trial Mode
 Trials and challenges for Castlevania: SotN through a LUA script for Bizhawk, intended to help runners with learning essential speedrunning tricks and test players with difficult and interesting challenges.
 
-## Version 0.9.4
+## Version 0.9.5
 This fork of the original Trial Mode was made primarily so that it would work in newer versions of Bizhawk, such as 2.9.1. Other improvemens may be made as I think of them.
 
 ### changelog
+
+#### 0.9.5
+* Added special case checks for Frontslide to improve accuracy
+* Added special case checks for Autodash to improve accuracy
 
 #### 0.9.4
 * Added ability to hard-code inputs for a demo
