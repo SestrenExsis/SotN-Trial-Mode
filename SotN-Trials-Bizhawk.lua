@@ -103,14 +103,14 @@ local constants = {
         triangle = "images/triangle.png",
         r1 = "images/r1.png",
         r2 = "images/r2.png",
-        l1 = "images/l1.png",
+        mist = "images/l1.png",
         l2 = "images/l2.png",
         up = "images/arrow8.png",
         down = "images/arrow2.png",
         left = "images/arrow4.png",
         right = "images/arrow6.png",
-        upleft = "images/arrow9.png",
-        upright = "images/arrow7.png",
+        upleft = "images/arrow7.png",
+        upright = "images/arrow9.png",
         downleft = "images/arrow1.png",
         downright = "images/arrow3.png",
         start = "images/start.png",
@@ -855,6 +855,7 @@ local function alucardTrialRichterSkip(passedTrialData)
             }
         }
     end
+
     --run common trial functionality including standard input checks
     local inputs = joypad.get()
     trialCommon(localTrialData, inputs)
@@ -1163,7 +1164,7 @@ local function alucardTrialAutodash(passedTrialData)
                     },
                     counter = false
                 }, {
-                    images = {constants.buttonImages.l1},
+                    images = {constants.buttonImages.mist},
                     description = "Mist",
                     completed = false,
                     buttonsHold = {mnemonics.Left},
@@ -1315,7 +1316,7 @@ local function alucardTrialFloorClip(passedTrialData)
                     },
                     counter = false
                 }, {
-                    images = {constants.buttonImages.l1},
+                    images = {constants.buttonImages.mist},
                     description = "mist",
                     text = "(hold)",
                     completed = false,
@@ -1457,64 +1458,53 @@ local function alucardTrialBookJump(passedTrialData)
             mistakeMessage = "",
             currentMove = 2,
             moves = {
-                {text = "Book Jump:", completed = true}, {
-                    images = {constants.buttonImages.right},
-                    text = "",
-                    description = "Right",
-                    completed = false,
-                    buttons = { mnemonics.Right },
-                    failButtons = { },
-                    counter = false
-                }, {
-                    skipDrawing = true,
-                    text = nil,
-                    buttonsUp = { mnemonics.Right },
-                    counter = false,
-                    completed = false
-                }, {
-                    images = {constants.buttonImages.right},
+                {
+                    text = "Book Jump:",
+                    completed = true
+                }, { -- 2: Dash
+                    images = {
+                        constants.buttonImages.right,
+                        constants.buttonImages.right,
+                    },
                     text = "(hold)",
-                    description = "Right(hold)",
+                    description = "Dash (hold)",
                     completed = false,
-                    buttons = { mnemonics.Right },
-                    failButtons = { },
+                    manualCheck = true,
                     counter = false
-                }, {
-                    images = {constants.buttonImages.left},
+                }, { -- 3: Turnaround jump
+                    images = {constants.buttonImages.cross, constants.buttonImages.left},
                     text = "(hold)",
-                    description = "Left(hold)",
+                    description = "Jump + Left (hold)",
                     completed = false,
-                    buttonsUp = { mnemonics.Right },
-                    buttons = { mnemonics.Left },
-                    failButtons = { },
+                    manualCheck = true,
                     counter = false
-                }, {
-                    images = {constants.buttonImages.jump},
+                }, { -- 4: Delayed Mist
+                    images = {constants.buttonImages.upleft, constants.buttonImages.mist},
+                    text = "(hold)",
+                    description = "Up/Left + Mist (hold)",
+                    completed = false,
+                    manualCheck = true,
+                    counter = false
+                }, { -- 5: Turnaround Divekick
+                    images = {constants.buttonImages.downright, constants.buttonImages.cross},
                     text = "",
-                    description = "Jump",
-                    completed = false,
-                    buttonsDown = { mnemonics.Left },
-                    buttons = { mnemonics.Jump },
-                    failButtons = { },
-                    counter = false
-                }, {
-                    images = {constants.buttonImages.l2},
-                    text = "Mist",
-                    description = "Mist",
-                    completed = false,
-                    buttonsDown = { mnemonics.Up, mnemonics.Left },
-                    buttons = { mnemonics.Mist },
-                    failButtons = { },
-                    counter = false
-                }, {
-                    images = {constants.buttonImages.l2},
-                    text = "Divekick",
                     description = "Divekick",
                     completed = false,
-                    buttonsDown = { mnemonics.Down, mnemonics.Right },
-                    buttons = { mnemonics.Jump },
-                    failButtons = { },
+                    manualCheck = true,
                     counter = false
+                }, { -- 6: Hold left
+                    images = {constants.buttonImages.left},
+                    text = "(hold)",
+                    description = "Left (hold)",
+                    completed = false,
+                    manualCheck = true,
+                    counter = false
+                }, {
+                    description = "Wait for landing",
+                    text = "Wait for landing",
+                    manualCheck = true,
+                    completed = false,
+                    counter = true
                 },
             },
             demoInputs = {
@@ -1522,23 +1512,75 @@ local function alucardTrialBookJump(passedTrialData)
                 { duration = 3, buttons = {  } },
                 { duration = 45, buttons = { mnemonics.Right } },
                 { duration = 3, buttons = {  } },
-                { duration = 204, buttons = { mnemonics.Left } },
-                { duration = 61, buttons = { mnemonics.Left, mnemonics.Jump } },
+                { duration = 201, buttons = { mnemonics.Left } },
+                { duration = 66, buttons = { mnemonics.Left, mnemonics.Jump } },
                 { duration = 3, buttons = { mnemonics.Up, mnemonics.Left, mnemonics.Mist } },
-                { duration = 71, buttons = { mnemonics.Up, mnemonics.Left } },
-                { duration = 6, buttons = { mnemonics.Down, mnemonics.Right, mnemonics.Jump } },
-                { duration = 180, buttons = { mnemonics.Up, mnemonics.Left } },
+                { duration = 72, buttons = { mnemonics.Up, mnemonics.Left } },
+                { duration = 4, buttons = { mnemonics.Down, mnemonics.Right, mnemonics.Jump } },
+                { duration = 180, buttons = { mnemonics.Left } },
             }
         }
     end
-
+    
+    --run common trial functionality including standard input checks
     local inputs = joypad.get()
-
     trialCommon(localTrialData, inputs)
     if localTrialData.moves == nil then
         return localTrialData
     end
 
+    --special case checks
+    local currentXpos = mainmemory.read_u16_le(constants.memoryData.characterXpos)
+    local currentYpos = mainmemory.read_u16_le(constants.memoryData.characterYpos)
+    local currentVelocityX = f32(0x0733E0)
+    local currentVelocityY = f32(0x0733E4)
+    local currentState = mainmemory.read_u8(0x073404)
+    if localTrialData.currentMove == 2 then
+        -- Check for dash
+        if currentXpos >= 115 and currentYpos >= 663 then
+            if currentVelocityX >= 2.5 then
+                localTrialData.moves[localTrialData.currentMove].completed = true
+                localTrialData.currentMove = localTrialData.currentMove + 1
+            else
+                localTrialData.moves[localTrialData.currentMove].completed = false
+                localTrialData.failedState = true
+                localTrialData.mistakeMessage = "Failed to achieve a dash!"
+            end
+        end
+    elseif localTrialData.currentMove == 3 then
+        -- Check for turnaround jump
+        if currentXpos >= 577 and currentYpos <= 373 then
+            localTrialData.moves[localTrialData.currentMove].completed = false
+            localTrialData.failedState = true
+            localTrialData.mistakeMessage = "Went too far right before jumping!"
+        elseif currentXpos >= 500 and currentYpos <= 450 then
+            -- Is Alucard jumping to the left yet?
+            if currentVelocityX <= -0.5 and (currentXpos + currentYpos) < 950 then
+                localTrialData.moves[localTrialData.currentMove].completed = true
+                localTrialData.currentMove = localTrialData.currentMove + 1
+            end
+        end
+    elseif localTrialData.currentMove == 4 then
+        -- Check for delayed Mist
+        if currentState == 7 then
+            localTrialData.moves[localTrialData.currentMove].completed = true
+            localTrialData.currentMove = localTrialData.currentMove + 1
+        end
+    elseif localTrialData.currentMove == 5 then
+        -- Check for turnaround Divekick
+        if currentVelocityY >= 6.0 then
+            localTrialData.moves[localTrialData.currentMove].completed = true
+            localTrialData.currentMove = localTrialData.currentMove + 1
+        end
+    elseif localTrialData.currentMove == 6 then
+        -- Check for Hold left
+        if currentVelocityX <= -1.5 then
+            localTrialData.moves[localTrialData.currentMove].completed = true
+            localTrialData.currentMove = localTrialData.currentMove + 1
+        end
+    end
+
+    --returning an empty table restarts the trial
     if localTrialData.failedState and localTrialData.frameCounter > 160 then
         return {}
     end
@@ -1546,8 +1588,8 @@ local function alucardTrialBookJump(passedTrialData)
     if localTrialData.successState and localTrialData.frameCounter > 160 then
         if settings.autoContinue and settings.consistencyTraining == false and localTrialData.demoOn ~= true then
             commonVariables.currentTrial = commonVariables.currentTrial + 1
-        elseif settings.autoContinue and settings.consistencyTraining and
-            commonVariables.currentSuccesses > 9 and localTrialData.demoOn ~= true then
+        elseif settings.autoContinue and settings.consistencyTraining and localTrialData.demoOn ~= true and
+            commonVariables.currentSuccesses > 9 then
             commonVariables.currentTrial = commonVariables.currentTrial + 1
         end
         return {}
