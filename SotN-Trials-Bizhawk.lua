@@ -19,6 +19,12 @@ local function getVersion()
     return version
 end
 
+if getVersion() == "2.9" then
+    require "Utilities/Math29"
+else
+    require "Utilities/MathLegacy"
+end
+
 local settings = {consistencyTraining = false, autoContinue = true, renderPixelPro = true}
 local saveData = {
     alucardTrialRichterSkip = 0,
@@ -595,10 +601,10 @@ local function f32(start)
     local c = mainmemory.readbyte(start + 1)
     local d = mainmemory.readbyte(start)
     local result = 0
-    if (a & 0x80) > 0 then
-        result = ((a << 0x08) + b + (c / 0x100) + (d / 0x10000)) - 0x10000
+    if Math.band(a, 0x80) > 0 then
+        result = (Math.lshift(a, 0x08) + b + (c / 0x100) + (d / 0x10000)) - 0x10000
     else
-        result = (a << 0x08) + b + (c / 0x100) + ((0x7F & d) / 0x10000)
+        result = Math.lshift(a, 0x08) + b + (c / 0x100) + (Math.band(0x7F, d) / 0x10000)
     end
     return result
 end
@@ -1600,11 +1606,11 @@ local function richterTrialSlidingAirslash(passedTrialData)
                         },
                         {
                             button = mnemonics.Left,
-                            failMessage = "Out of possition!"
+                            failMessage = "Out of position!"
                         },
                         {
                             button = mnemonics.Right,
-                            failMessage = "Out of possition!"
+                            failMessage = "Out of position!"
                         },
                         {
                             button = mnemonics.Attack,
@@ -1731,11 +1737,11 @@ local function richterTrialVaultingAirslash(passedTrialData)
                         },
                         {
                             button = mnemonics.Left,
-                            failMessage = "Out of possition!"
+                            failMessage = "Out of position!"
                         },
                         {
                             button = mnemonics.Right,
-                            failMessage = "Out of possition!"
+                            failMessage = "Out of position!"
                         }
                     },
                     counter = true
@@ -2078,7 +2084,7 @@ event.onexit(
     function ()
          forms.destroy(guiForm.mainForm)
          --update ini file settings and save data
-         weiteToIni(serializeObject(settings, "settings") .. serializeObject(saveData, "saveData"), "config.ini")
+         writeToIni(serializeObject(settings, "settings") .. serializeObject(saveData, "saveData"), "config.ini")
     end
 )
 
@@ -2086,7 +2092,7 @@ while true do
     --end script when the form is closed
     if forms.gettext(guiForm.mainForm) == "" then
         --update ini file settings and save data
-        weiteToIni(serializeObject(settings, "settings") .. serializeObject(saveData, "saveData"), "config.ini")
+        writeToIni(serializeObject(settings, "settings") .. serializeObject(saveData, "saveData"), "config.ini")
 		return
     end
     
