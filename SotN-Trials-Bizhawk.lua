@@ -1524,7 +1524,7 @@ local function alucardTrialBookJump(passedTrialData)
                 { duration = 201, buttons = { mnemonics.Left } },
                 { duration = 66, buttons = { mnemonics.Left, mnemonics.Jump } },
                 { duration = 3, buttons = { mnemonics.Up, mnemonics.Left, mnemonics.Mist } },
-                { duration = 172, buttons = { mnemonics.Up, mnemonics.Left } },
+                { duration = 72, buttons = { mnemonics.Up, mnemonics.Left } },
                 { duration = 4, buttons = { mnemonics.Down, mnemonics.Right, mnemonics.Jump } },
                 { duration = 120, buttons = { mnemonics.Left } },
             }
