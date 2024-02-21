@@ -487,8 +487,8 @@ local function runDemo(localTrialData)
     local failCondition = false
     local inputsToSet = {}
 
-    --skip challenges
-    if commonVariables.currentTrial == 6 or commonVariables.currentTrial == 7 then
+    --skip if demo not enabled
+    if localTrialData.enableDemo == false then
         return
     end
 
@@ -549,7 +549,11 @@ local function trialCommon(localTrialData, inputs)
     if settings.renderPixelPro == false then
         scaling = 0.75
     end
-    gui.drawText(constants.drawspace.centerX, constants.drawspace.height - (15 * scaling), "L2 + Up to restart                  L2 + Down to play demo", 0xFFFFFFFF, 0x00000000, (14 * scaling), "Arial", "bold", "center")
+    local message = "L2 + Up to restart"
+    if localTrialData.enableDemo then
+        message = message.."                  L2 + Down to play demo"
+    end
+    gui.drawText(constants.drawspace.centerX, constants.drawspace.height - (15 * scaling), message, 0xFFFFFFFF, 0x00000000, (14 * scaling), "Arial", "bold", "center")
 
     ---------------------------
     --pause buffering support--
@@ -655,10 +659,12 @@ end
 
 local function alucardTrialTemplate(passedTrialData)
     local localTrialData = passedTrialData
+    -- initialize trial data on start or restart
     if localTrialData.moves == nil then
         loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
+            enableDemo = true,
             demoOn = passedTrialData.demoOn,
             frameCounter = 0,
             counterOn = false,
@@ -667,6 +673,7 @@ local function alucardTrialTemplate(passedTrialData)
             resetState = false,
             mistakeMessage = "",
             currentMove = 2,
+            -- table of the trial steps called moves, with condition check properties like buttons to be pressed, held down, etc.
             moves = {
                 {text = "Template:", completed = true}, {
                     images = {constants.buttonImages.left},
@@ -687,6 +694,7 @@ local function alucardTrialTemplate(passedTrialData)
         }
     end
 
+    -- run common trial functionality including standard input checks
     local inputs = joypad.get()
 
     trialCommon(localTrialData, inputs)
@@ -694,6 +702,10 @@ local function alucardTrialTemplate(passedTrialData)
         return localTrialData
     end
 
+    -- special case checks
+    -- Manual checking can be added here
+
+    -- returning an empty table restarts the trial
     if localTrialData.failedState and localTrialData.frameCounter > 160 then
         return {}
     end
@@ -719,6 +731,7 @@ end
 -------------------
 --Trial Functions--
 ------Alucard------
+
 local function alucardTrialRichterSkip(passedTrialData)
     local localTrialData = passedTrialData
     --initialize trial data on start or restart
@@ -726,6 +739,7 @@ local function alucardTrialRichterSkip(passedTrialData)
         loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
+            enableDemo = true,
             demoOn = passedTrialData.demoOn,
             frameCounter = 0,
             counterOn = false,
@@ -925,6 +939,7 @@ local function alucardTrialFrontslide(passedTrialData)
         loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
+            enableDemo = true,
             demoOn = passedTrialData.demoOn,
             frameCounter = 0,
             counterOn = false,
@@ -1148,6 +1163,7 @@ local function alucardTrialAutodash(passedTrialData)
         loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
+            enableDemo = true,
             demoOn = passedTrialData.demoOn,
             frameCounter = 0,
             counterOn = false,
@@ -1297,6 +1313,7 @@ local function alucardTrialFloorClip(passedTrialData)
         loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
+            enableDemo = true,
             demoOn = passedTrialData.demoOn,
             frameCounter = 0,
             counterOn = false,
@@ -1461,6 +1478,7 @@ local function alucardTrialBookJump(passedTrialData)
         end
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
+            enableDemo = true,
             demoOn = passedTrialData.demoOn,
             frameCounter = 0,
             counterOn = false,
@@ -1671,6 +1689,7 @@ local function alucardChallengeShieldDashSpeed(passedTrialData)
         loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
+            enableDemo = false,
             demoOn = passedTrialData.demoOn,
             lastXpos = currentXpos,
             frameCounter = 0,
@@ -1787,6 +1806,7 @@ local function alucardChallengeForceOfEchoTimeTrial(passedTrialData)
         loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
+            enableDemo = false,
             demoOn = passedTrialData.demoOn,
             start = false,
             frameCounter = 0,
@@ -1899,6 +1919,7 @@ local function alucardChallengeForceOfEchoTimeTrial(passedTrialData)
     customMessageDisplay(0, "          Get Force of Echo and return before time reaches 29.5!")
     return localTrialData
 end
+
 ------Richter------
 local function richterTrialSlidingAirslash(passedTrialData)
     local localTrialData = passedTrialData
@@ -1906,6 +1927,7 @@ local function richterTrialSlidingAirslash(passedTrialData)
         loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
+            enableDemo = true,
             demoOn = passedTrialData.demoOn,
             frameCounter = 0,
             counterOn = false,
@@ -2034,6 +2056,7 @@ local function richterTrialVaultingAirslash(passedTrialData)
         loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
+            enableDemo = true,
             demoOn = passedTrialData.demoOn,
             frameCounter = 0,
             counterOn = false,
@@ -2190,6 +2213,7 @@ local function richterTrialOtgAirslash(passedTrialData)
         loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
+            enableDemo = true,
             demoOn = passedTrialData.demoOn,
             frameCounter = 0,
             counterOn = false,
@@ -2315,6 +2339,7 @@ local function richterChallengeMinotaurRoomTimeTrial(passedTrialData)
         loadSavestate()
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
+            enableDemo = false,
             demoOn = passedTrialData.demoOn,
             start = false,
             frameCounter = 0,
