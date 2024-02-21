@@ -25,7 +25,12 @@ else
     require "Utilities/MathLegacy"
 end
 
-local settings = {consistencyTraining = false, autoContinue = true, renderPixelPro = true}
+local settings = {
+    consistencyTraining = false,
+    autoContinue = true,
+    renderPixelPro = true,
+    shuffleRNG = false,
+}
 local saveData = {
     alucardTrialRichterSkip = 0,
     alucardTrialFrontslide = 0,
@@ -95,6 +100,7 @@ local constants = {
         roomForceOfEchoValue = 20,
         roomMinotaurValue = 124,
         roomMinotaurEscapedValue = 100,
+        niceRngSeed = 0x0978B8,
     },
     buttonImages = {
         cross = "images/cross.png",
@@ -1449,6 +1455,10 @@ local function alucardTrialBookJump(passedTrialData)
     local localTrialData = passedTrialData
     if localTrialData.moves == nil then
         loadSavestate()
+        if settings.shuffleRNG == true then
+            local randomSeed = math.random(0, 4294967295)
+            mainmemory.write_u32_le(constants.memoryData.niceRngSeed, randomSeed)
+        end
         commonVariables.lastResetFrame = emu.framecount()
         localTrialData = {
             demoOn = passedTrialData.demoOn,
@@ -2420,7 +2430,13 @@ while true do
         return
     end
     
-    updateSettings(settings, guiForm.interfaceCheckboxConsistency, guiForm.interfaceCheckboxContinue, guiForm.interfaceCheckboxRendering)
+    updateSettings(
+        settings,
+        guiForm.interfaceCheckboxConsistency,
+        guiForm.interfaceCheckboxContinue,
+        guiForm.interfaceCheckboxRendering,
+        guiForm.interfaceCheckboxShuffleRNG
+    )
 
     if commonVariables.currentTrial > #trials then
         commonVariables.currentTrial = commonVariables.currentTrial - 1

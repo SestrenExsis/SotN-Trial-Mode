@@ -1,14 +1,20 @@
 function initForm(commonVariables, saveData, guiForm, settings)
     guiForm.mainForm = forms.newform(236, 580, "Castlevania: SOTN Trial Mode")
+    
     guiForm.interfaceCheckboxConsistency = forms.checkbox(guiForm.mainForm, "Consistency training mode", 10, 10)
     forms.setproperty(guiForm.interfaceCheckboxConsistency, "Checked", settings.consistencyTraining)
+    
     guiForm.interfaceCheckboxContinue = forms.checkbox(guiForm.mainForm, "Auto advance to next trial", 10, 30)
     forms.setproperty(guiForm.interfaceCheckboxContinue, "Checked", settings.autoContinue)
+    
     guiForm.interfaceCheckboxRendering = forms.checkbox(guiForm.mainForm, "Rendering mode PixelPro", 10, 50)
     forms.setproperty(guiForm.interfaceCheckboxRendering, "Checked", settings.renderPixelPro)
+
+    guiForm.interfaceCheckboxShuffleRNG = forms.checkbox(guiForm.mainForm, "Shuffle RNG", 10, 70)
+    forms.setproperty(guiForm.interfaceCheckboxShuffleRNG, "Checked", settings.shuffleRNG)
     
     -- Alucard Trials
-    local y = 80
+    local y = 100
     forms.label(guiForm.mainForm, "Alucard Trials:", 10, y, 220, 20)
     y = y + 22
     guiForm.alucardTrialRichterSkipButton = forms.button(guiForm.mainForm, "Richter Skip   cleared:" .. saveData["alucardTrialRichterSkip"],
@@ -124,7 +130,13 @@ function updateForm(saveData, guiForm)
     forms.settext(guiForm.richterChallengeMinotaurRoomTimeTrialButton,  "Minotaur Room   cleared:" .. saveData["richterChallengeMinotaurRoomTimeTrial"])
 end
 
-function updateSettings(settings, interfaceCheckboxConsistency, interfaceCheckboxContinue, interfaceCheckboxRendering)
+function updateSettings(
+    settings,
+    interfaceCheckboxConsistency,
+    interfaceCheckboxContinue,
+    interfaceCheckboxRendering,
+    interfaceCheckboxShuffleRNG
+)
     if forms.ischecked(interfaceCheckboxConsistency) then
         settings.consistencyTraining = true
     else
@@ -139,5 +151,10 @@ function updateSettings(settings, interfaceCheckboxConsistency, interfaceCheckbo
         settings.renderPixelPro = true
     else
         settings.renderPixelPro = false
+    end
+    if forms.ischecked(interfaceCheckboxShuffleRNG) then
+        settings.shuffleRNG = true
+    else
+        settings.shuffleRNG = false
     end
 end
