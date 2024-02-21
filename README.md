@@ -1,10 +1,13 @@
 # SOTN Trial Mode
 Trials and challenges for Castlevania: SotN through a LUA script for Bizhawk, intended to help runners with learning essential speedrunning tricks and test players with difficult and interesting challenges.
 
-## Version 0.9.6
+## Version 0.9.7
 This fork of the original Trial Mode was made primarily so that it would work in newer versions of Bizhawk, such as 2.9.1. Other improvemens may be made as I think of them.
 
 ### changelog
+
+#### 0.9.7
+* Add option to shuffle RNG
 
 #### 0.9.6
 * Add Book Jump trial
