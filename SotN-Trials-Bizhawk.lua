@@ -33,6 +33,7 @@ local settings = {
 }
 local saveData = {
     alucardTrialRichterSkip = 0,
+    alucardTrialNeutronBombDeathSkip = 0,
     alucardTrialFrontslide = 0,
     alucardTrialAutodash = 0,
     alucardTrialFloorClip = 0,
@@ -134,6 +135,11 @@ local trials = {
         saveState = "Alucard - Richter Skip",
         trialToRun = nil,
     },
+    { -- alucardTrialNeutronBombDeathSkip
+        trialName = "alucardTrialNeutronBombDeathSkip",
+        saveState = "Alucard - Neutron Bomb Death Skip",
+        trialToRun = nil,
+    },
     { -- alucardTrialFrontslide
         trialName = "alucardTrialFrontslide",
         saveState = "Alucard - Frontslide",
@@ -201,6 +207,7 @@ local guiForm = {
     interfaceCheckboxContinue = nil,
     interfaceCheckboxRendering = nil,
     alucardTrialRichterSkipButton = nil,
+    alucardTrialNeutronBombDeathSkipButton = nil,
     alucardTrialFrontslideButton = nil,
     alucardTrialAutodashButton = nil,
     alucardTrialFloorClipButton = nil,
@@ -264,24 +271,41 @@ local function trialMoveDisplay(moves, currentMove)
             if moves[i].images ~= nil then
                 local separatorOffset = 0
                 for j = 1, #moves[i].images do
-                    gui.drawImage(moves[i].images[j], (10 * scaling) + position + (separatorOffset * scaling) + ((j - 1) * 20 * scaling),
-                               (4 * scaling) + (row * rowheight * scaling), 20 * scaling, 20 * scaling, true)
-
+                    gui.drawImage(
+                        moves[i].images[j],
+                        (10 * scaling) + position + (separatorOffset * scaling) + ((j - 1) * 20 * scaling),
+                        (4 * scaling) + (row * rowheight * scaling),
+                        20 * scaling,
+                        20 * scaling,
+                        true
+                    )
                     if moves[i].separators and j < separatorsCount + 1 then
-                        gui.drawText((10 * scaling) + position + separatorOffset + (j * 20 * scaling), (4 * scaling) + (row * rowheight * scaling),
-                        moves[i].separators[j],
-                          0xFFFFFFFF,
-                          0x00000000, 15 * scaling, "Arial", "bold")
-                          separatorOffset = separatorOffset + 20
+                        gui.drawText(
+                            (10 * scaling) + position + separatorOffset + (j * 20 * scaling),
+                            (4 * scaling) + (row * rowheight * scaling),
+                            moves[i].separators[j],
+                            0xFFFFFFFF,
+                            0x00000000,
+                            15 * scaling,
+                            "Arial",
+                            "bold"
+                        )
+                        separatorOffset = separatorOffset + 20
                     end
                 end
             end
 
             if moves[i].text ~= nil then
-                gui.drawText( (10 * scaling) + position + (imagesCount * 20 * scaling), 6 * scaling + (row * rowheight * scaling),
-                          moves[i].text,
-                          0xFFFFFFFF,
-                          0x00000000, 14 * scaling, "Arial", "bold")
+                gui.drawText(
+                    (10 * scaling) + position + (imagesCount * 20 * scaling),
+                    6 * scaling + (row * rowheight * scaling),
+                    moves[i].text,
+                    0xFFFFFFFF,
+                    0x00000000,
+                    14 * scaling,
+                    "Arial",
+                    "bold"
+                )
             end
             position = position + boxWidth
         end
@@ -920,6 +944,176 @@ local function alucardTrialRichterSkip(passedTrialData)
             commonVariables.currentTrial = commonVariables.currentTrial + 1
         elseif settings.autoContinue and settings.consistencyTraining and localTrialData.demoOn ~= true and
             commonVariables.currentSuccesses > 9 then
+            commonVariables.currentTrial = commonVariables.currentTrial + 1
+        end
+        return {}
+    end
+
+    if localTrialData.resetState then
+        return {}
+    end
+
+    trialMoveDisplay(localTrialData.moves, localTrialData.currentMove)
+    return localTrialData
+end
+
+local function alucardTrialNeutronBombDeathSkip(passedTrialData)
+    local localTrialData = passedTrialData
+    -- initialize trial data on start or restart
+    if localTrialData.moves == nil then
+        loadSavestate()
+        commonVariables.lastResetFrame = emu.framecount()
+        localTrialData = {
+            enableDemo = true,
+            demoOn = passedTrialData.demoOn,
+            frameCounter = 0,
+            counterOn = false,
+            failedState = false,
+            successState = false,
+            resetState = false,
+            mistakeMessage = "",
+            currentMove = 2,
+            -- table of the trial steps called moves, with condition check properties like buttons to be pressed, held down, etc.
+            moves = {
+                {
+                    text = "Neutron Bomb Death Skip:",
+                    completed = true,
+                }, {
+                    description = "Jump over the Warg",
+                    text = "Jump over Warg",
+                    manualCheck = true,
+                    completed = false,
+                    counter = true
+                }, {
+                    description = "Lure the Warg to the right",
+                    text = "Lure Warg right",
+                    manualCheck = true,
+                    completed = false,
+                    counter = true
+                }, {
+                    description = "Break the secret block",
+                    text = "Break block",
+                    manualCheck = true,
+                    completed = false,
+                    counter = true
+                }, {
+                    description = "Get into position",
+                    text = "Get into position",
+                    manualCheck = true,
+                    completed = false,
+                    counter = true
+                }, {
+                    description = "Equip Neutron Bomb",
+                    text = "Equip Neutron Bomb",
+                    manualCheck = true,
+                    completed = false,
+                    counter = true
+                -- }, {
+                --     description = "Hold LEFT+ATTACK until level up starts",
+                --     text = "LEFT + BOMB",
+                --     manualCheck = true,
+                --     completed = false,
+                --     counter = true
+                -- }, {
+                --     description = "Hold DASH until after level up finishes",
+                --     text = "Hold DASH",
+                --     manualCheck = true,
+                --     completed = false,
+                --     counter = true
+                -- }, {
+                --     description = "Jump OVER the stairs",
+                --     text = "Jump OVER stairs",
+                --     manualCheck = true,
+                --     completed = false,
+                --     counter = true
+                -- }, {
+                --     description = "Walk to the next room",
+                --     text = "Walk RIGHT",
+                --     manualCheck = true,
+                --     completed = false,
+                --     counter = true
+                }
+            },
+            demoInputs = { }
+        }
+    end
+
+    -- run common trial functionality including standard input checks
+    local inputs = joypad.get()
+
+    trialCommon(localTrialData, inputs)
+    if localTrialData.moves == nil then
+        return localTrialData
+    end
+
+    -- special case checks
+    if localTrialData.successState == false and localTrialData.failedState == false then
+        local currentXpos = mainmemory.read_u16_le(constants.memoryData.characterXpos)
+        local wargScreenX = f32(0x077A58)
+        local wargX = currentXpos - 128 + wargScreenX
+        local wargHP = mainmemory.read_s16_le(0x077A96)
+        local secretBlock = mainmemory.read_u8(0x088A69)
+        if localTrialData.currentMove == 2 then
+            -- 1: Jump over the Warg
+            if currentXpos < 975 then
+                localTrialData.moves[localTrialData.currentMove].completed = false
+                localTrialData.failedState = true
+                localTrialData.mistakeMessage = "Going the wrong way!"
+            elseif wargHP <= 0 then
+                localTrialData.moves[localTrialData.currentMove].completed = false
+                localTrialData.failedState = true
+                localTrialData.mistakeMessage = "Killed the Warg too early!"
+            elseif wargScreenX <= 64.0 then
+                localTrialData.moves[localTrialData.currentMove].completed = true
+                localTrialData.currentMove = localTrialData.currentMove + 1
+            end
+        elseif localTrialData.currentMove == 3 then
+            -- 2: Lure the Warg to the right
+            if wargHP <= 0 then
+                localTrialData.moves[localTrialData.currentMove].completed = false
+                localTrialData.failedState = true
+                localTrialData.mistakeMessage = "Killed the Warg too early!"
+            elseif wargX >= 1280 then -- currentXpos >= 1417 and wargScreenX >= -50 then
+                localTrialData.moves[localTrialData.currentMove].completed = true
+                localTrialData.currentMove = localTrialData.currentMove + 1
+            end
+        elseif localTrialData.currentMove == 4 then
+            -- 3: Break the secret block
+            if wargHP <= 0 then
+                localTrialData.moves[localTrialData.currentMove].completed = false
+                localTrialData.failedState = true
+                localTrialData.mistakeMessage = "Killed the Warg too early!"
+            elseif secretBlock <= 0 then
+                localTrialData.moves[localTrialData.currentMove].completed = true
+                localTrialData.currentMove = localTrialData.currentMove + 1
+            end
+        elseif localTrialData.currentMove == 5 then
+            -- 4: All of the following
+                -- 4A: Get into position
+                -- 4B: Equip Neutron Bomb
+        elseif localTrialData.currentMove == 6 then
+            -- 5: Hold LEFT+ATTACK until level up starts
+        elseif localTrialData.currentMove == 7 then
+            -- 6: Hold DASH until after level up finishes
+        elseif localTrialData.currentMove == 8 then
+            -- 7: Jump OVER the stairs
+                -- Don't touch the stairs
+        elseif localTrialData.currentMove == 9 then
+            -- 8: Walk to the next room
+                -- Don't dash near the screen transition
+        end
+    end
+
+    -- returning an empty table restarts the trial
+    if localTrialData.failedState and localTrialData.frameCounter > 160 then
+        return {}
+    end
+
+    if localTrialData.successState and localTrialData.frameCounter > 160 then
+        if settings.autoContinue and settings.consistencyTraining == false and localTrialData.demoOn ~= true then
+            commonVariables.currentTrial = commonVariables.currentTrial + 1
+        elseif settings.autoContinue and settings.consistencyTraining and
+            commonVariables.currentSuccesses > 9 and localTrialData.demoOn ~= true then
             commonVariables.currentTrial = commonVariables.currentTrial + 1
         end
         return {}
@@ -2436,16 +2630,17 @@ event.onexit(
 )
 
 trials[1].trialToRun = alucardTrialRichterSkip
-trials[2].trialToRun = alucardTrialFrontslide
-trials[3].trialToRun = alucardTrialAutodash
-trials[4].trialToRun = alucardTrialFloorClip
-trials[5].trialToRun = alucardTrialBookJump
-trials[6].trialToRun = alucardChallengeShieldDashSpeed
-trials[7].trialToRun = alucardChallengeForceOfEchoTimeTrial
-trials[8].trialToRun = richterTrialSlidingAirslash
-trials[9].trialToRun = richterTrialVaultingAirslash
-trials[10].trialToRun = richterTrialOtgAirslash
-trials[11].trialToRun = richterChallengeMinotaurRoomTimeTrial
+trials[2].trialToRun = alucardTrialNeutronBombDeathSkip
+trials[3].trialToRun = alucardTrialFrontslide
+trials[4].trialToRun = alucardTrialAutodash
+trials[5].trialToRun = alucardTrialFloorClip
+trials[6].trialToRun = alucardTrialBookJump
+trials[7].trialToRun = alucardChallengeShieldDashSpeed
+trials[8].trialToRun = alucardChallengeForceOfEchoTimeTrial
+trials[9].trialToRun = richterTrialSlidingAirslash
+trials[10].trialToRun = richterTrialVaultingAirslash
+trials[11].trialToRun = richterTrialOtgAirslash
+trials[12].trialToRun = richterChallengeMinotaurRoomTimeTrial
 
 while true do
     --end script when the form is closed

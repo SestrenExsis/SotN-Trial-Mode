@@ -17,6 +17,8 @@ function initForm(commonVariables, saveData, guiForm, settings)
     local y = 100
     forms.label(guiForm.mainForm, "Alucard Trials:", 10, y, 220, 20)
     y = y + 22
+
+    -- Richter Skip
     guiForm.alucardTrialRichterSkipButton = forms.button(guiForm.mainForm, "Richter Skip   cleared:" .. saveData["alucardTrialRichterSkip"],
         function(x)
             commonVariables.trialData = {}
@@ -24,28 +26,36 @@ function initForm(commonVariables, saveData, guiForm, settings)
         end
     , 10, y, 200, 20)
     y = y + 22
-    guiForm.alucardTrialFrontslideButton = forms.button(guiForm.mainForm, "Frontslide   cleared:" .. saveData["alucardTrialFrontslide"],
+
+    -- Neutron Bomb Death Skip
+    guiForm.alucardTrialNeutronBombDeathSkipButton = forms.button(guiForm.mainForm, "Neutron Bomb Death Skip   cleared:" .. saveData["alucardTrialNeutronBombDeathSkip"],
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 2
         end
     , 10, y, 200, 20)
     y = y + 22
-    guiForm.alucardTrialAutodashButton = forms.button(guiForm.mainForm, "Autodash   cleared:" .. saveData["alucardTrialAutodash"],
+
+    -- Frontslide
+    guiForm.alucardTrialFrontslideButton = forms.button(guiForm.mainForm, "Frontslide   cleared:" .. saveData["alucardTrialFrontslide"],
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 3
         end
     , 10, y, 200, 20)
     y = y + 22
-    guiForm.alucardTrialFloorClipButton = forms.button(guiForm.mainForm, "Floor Clip   cleared:" .. saveData["alucardTrialFloorClip"],
+
+    -- Autodash
+    guiForm.alucardTrialAutodashButton = forms.button(guiForm.mainForm, "Autodash   cleared:" .. saveData["alucardTrialAutodash"],
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 4
         end
     , 10, y, 200, 20)
     y = y + 22
-    guiForm.alucardTrialBookJumpButton = forms.button(guiForm.mainForm, "Book Jump    cleared:" .. saveData["alucardTrialBookJump"],
+
+    -- Library Floor Clip
+    guiForm.alucardTrialFloorClipButton = forms.button(guiForm.mainForm, "Floor Clip   cleared:" .. saveData["alucardTrialFloorClip"],
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 5
@@ -53,17 +63,21 @@ function initForm(commonVariables, saveData, guiForm, settings)
     , 10, y, 200, 20)
     y = y + 22
 
-    -- Alucard Challenges
-    forms.label(guiForm.mainForm, "Alucard Challenges:", 10, y, 220, 20)
-    y = y + 22
-    guiForm.alucardChallengeShieldDashSpeedButton = forms.button(guiForm.mainForm, "ShieldDashing avg spd   cleared:" .. saveData["alucardChallengeShieldDashSpeed"],
+    -- Book Jump
+    guiForm.alucardTrialBookJumpButton = forms.button(guiForm.mainForm, "Book Jump    cleared:" .. saveData["alucardTrialBookJump"],
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 6
         end
     , 10, y, 200, 20)
     y = y + 22
-    guiForm.alucardChallengeForceOfEchoTimeTrialButton = forms.button(guiForm.mainForm, "Force of Echo time trial   cleared:"  .. saveData["alucardChallengeForceOfEchoTimeTrial"],
+
+    -- Alucard Challenges
+    forms.label(guiForm.mainForm, "Alucard Challenges:", 10, y, 220, 20)
+    y = y + 22
+
+    -- Shield Dashing Average Speed Challenge
+    guiForm.alucardChallengeShieldDashSpeedButton = forms.button(guiForm.mainForm, "ShieldDashing avg spd   cleared:" .. saveData["alucardChallengeShieldDashSpeed"],
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 7
@@ -71,27 +85,42 @@ function initForm(commonVariables, saveData, guiForm, settings)
     , 10, y, 200, 20)
     y = y + 22
 
-    -- Richter Trials
-    forms.label(guiForm.mainForm, "Richter Trials:", 10, y, 220, 20)
-    y = y + 22
-    guiForm.richterTrialSlidingAirslashButton = forms.button(guiForm.mainForm, "Sliding Airslash   cleared:" .. saveData["richterTrialSlidingAirslash"],
+    -- Force of Echo Time Trial Challenge
+    guiForm.alucardChallengeForceOfEchoTimeTrialButton = forms.button(guiForm.mainForm, "Force of Echo time trial   cleared:"  .. saveData["alucardChallengeForceOfEchoTimeTrial"],
         function(x)
-            commonVariables.trialData.moves = nil
+            commonVariables.trialData = {}
             commonVariables.currentTrial = 8
         end
     , 10, y, 200, 20)
     y = y + 22
-    guiForm.richterTrialVaultingAirslashButton = forms.button(guiForm.mainForm, "Vaulting Airslash   cleared:" .. saveData["richterTrialVaultingAirslash"],
+
+    -- Richter Trials
+    forms.label(guiForm.mainForm, "Richter Trials:", 10, y, 220, 20)
+    y = y + 22
+    
+    -- Sliding Airslash
+    guiForm.richterTrialSlidingAirslashButton = forms.button(guiForm.mainForm, "Sliding Airslash   cleared:" .. saveData["richterTrialSlidingAirslash"],
         function(x)
-            commonVariables.trialData = {}
+            commonVariables.trialData.moves = nil
             commonVariables.currentTrial = 9
         end
     , 10, y, 200, 20)
     y = y + 22
+    
+    -- Vaulting Airslash
+    guiForm.richterTrialVaultingAirslashButton = forms.button(guiForm.mainForm, "Vaulting Airslash   cleared:" .. saveData["richterTrialVaultingAirslash"],
+        function(x)
+            commonVariables.trialData = {}
+            commonVariables.currentTrial = 10
+        end
+    , 10, y, 200, 20)
+    y = y + 22
+    
+    -- OTG Airslash
     guiForm.richterTrialOtgAirslashButton = forms.button(guiForm.mainForm, "Otg Airslash   cleared:" .. saveData["richterTrialOtgAirslash"],
         function(x) --richterTrialOtgAirslash
             commonVariables.trialData = {}
-            commonVariables.currentTrial = 10
+            commonVariables.currentTrial = 11
         end
     , 10, y, 200, 20)
     y = y + 22
@@ -99,10 +128,12 @@ function initForm(commonVariables, saveData, guiForm, settings)
     -- Richter Challenges
     forms.label(guiForm.mainForm, "Richter Challenges:", 10, y, 220, 20)
     y = y + 22
+    
+    -- Minotaur Room
     guiForm.richterChallengeMinotaurRoomTimeTrialButton = forms.button(guiForm.mainForm, "Minotaur Room   cleared:"  .. saveData["richterChallengeMinotaurRoomTimeTrial"],
         function(x)
             commonVariables.trialData = {}
-            commonVariables.currentTrial = 11
+            commonVariables.currentTrial = 12
         end
     , 10, y, 200, 20)
     y = y + 22
@@ -115,6 +146,7 @@ end
 function updateForm(saveData, guiForm)
     -- Alucard Trials
     forms.settext(guiForm.alucardTrialRichterSkipButton,  "Richter Skip   cleared:" .. saveData["alucardTrialRichterSkip"])
+    forms.settext(guiForm.alucardTrialNeutronBombDeathSkipButton,  "Neutron Bomb Death Skip   cleared:" .. saveData["alucardTrialNeutronBombDeathSkip"])
     forms.settext(guiForm.alucardTrialFrontslideButton,  "Frontslide   cleared:" .. saveData["alucardTrialFrontslide"])
     forms.settext(guiForm.alucardTrialAutodashButton,  "Autodash   cleared:" .. saveData["alucardTrialAutodash"])
     forms.settext(guiForm.alucardTrialFloorClipButton,  "Floor Clip   cleared:" .. saveData["alucardTrialFloorClip"])
