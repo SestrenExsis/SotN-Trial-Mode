@@ -39,6 +39,7 @@ local saveData = {
     alucardTrialBookJump = 0,
     alucardChallengeShieldDashSpeed = 0,
     alucardChallengeForceOfEchoTimeTrial = 0,
+    alucardChallengeLibraryEscapeTimeTrial = 0,
     richterTrialSlidingAirslash = 0,
     richterTrialVaultingAirslash = 0,
     richterTrialOtgAirslash = 0,
@@ -164,6 +165,11 @@ local trials = {
         saveState = "Alucard - Force of Echo",
         trialToRun = nil,
     },
+    { -- alucardChallengeLibraryEscapeTimeTrial
+        trialName = "alucardChallengeLibraryEscapeTimeTrial",
+        saveState = "Alucard - Soul of Bat",
+        trialToRun = nil,
+    },
     { -- richterTrialSlidingAirslash
         trialName = "richterTrialSlidingAirslash",
         saveState = "Richter - Sliding Airslash",
@@ -207,6 +213,7 @@ local guiForm = {
     alucardTrialBookJumpButton = nil,
     alucardChallengeShieldDashSpeedButton = nil,
     alucardChallengeForceOfEchoTimeTrialButton = nil,
+    alucardChallengeLibraryEscapeTimeTrialButton = nil,
     richterTrialSlidingAirslashButton = nil,
     richterTrialVaultingAirslashButton = nil,
     richterTrialOtgAirslashButton = nil,
@@ -1899,6 +1906,126 @@ local function alucardChallengeForceOfEchoTimeTrial(passedTrialData)
     customMessageDisplay(0, "          Get Force of Echo and return before time reaches 29.5!")
     return localTrialData
 end
+
+local function alucardChallengeLibraryEscapeTimeTrial(passedTrialData)
+    local localTrialData = passedTrialData
+    if localTrialData.moves == nil then
+        loadSavestate()
+        commonVariables.lastResetFrame = emu.framecount()
+        localTrialData = {
+            demoOn = passedTrialData.demoOn,
+            start = false,
+            frameCounter = 0,
+            seconds = 0,
+            milliseconds = 0.00000001,
+            counterOn = false,
+            timeAtFOE = nil,
+            hasForceOfEcho = false,
+            resetState = false,
+            successState = false,
+            failedState = false,
+            mistakeMessage = "",
+            moves = 0
+        }
+    end
+
+    if mainmemory.readbyte(constants.memoryData.currentRoom) ~= constants.memoryData.roomForceOfEchoValue and localTrialData.start == false then
+        localTrialData.counterOn = true
+        localTrialData.start = true
+    end
+
+    local inputs = joypad.get()
+
+    if localTrialData.counterOn then
+        localTrialData.frameCounter = localTrialData.frameCounter + 1
+        if localTrialData.frameCounter % 60 == 0 and
+            localTrialData.failedState == false and
+            localTrialData.successState == false
+        then
+            localTrialData.seconds = localTrialData.seconds + 1
+            localTrialData.milliseconds = localTrialData.seconds
+        elseif localTrialData.failedState == false and
+            localTrialData.successState == false
+        then
+            localTrialData.milliseconds = localTrialData.milliseconds + 0.0166
+        end
+        customMessageDisplay(1, string.format("%2.3f", localTrialData.milliseconds))
+    end
+
+    if mainmemory.readbyte(constants.memoryData.forceOfEcho) == 3 and
+        localTrialData.hasForceOfEcho == false
+    then
+        localTrialData.hasForceOfEcho = true
+        localTrialData.timeAtFOE = string.format("%2.3f", localTrialData.milliseconds)
+    end
+
+    if localTrialData.timeAtFOE ~= nil then
+        customMessageDisplay(2, "Force of Echo at: " .. localTrialData.timeAtFOE)
+    end
+
+    if localTrialData.start and
+        mainmemory.readbyte(constants.memoryData.currentRoom) == constants.memoryData.roomForceOfEchoValue and
+        localTrialData.hasForceOfEcho == false and
+        localTrialData.failedState == false and
+        localTrialData.successState == false
+    then
+        localTrialData.failedState = true
+        localTrialData.frameCounter = 0
+    elseif localTrialData.start and
+        mainmemory.readbyte(constants.memoryData.currentRoom) == constants.memoryData.roomForceOfEchoValue and
+        localTrialData.hasForceOfEcho and
+        localTrialData.failedState == false and
+        localTrialData.successState == false
+    then
+        localTrialData.successState = true
+        localTrialData.frameCounter = 0
+    end
+
+    if localTrialData.start and
+        localTrialData.seconds > 28 and
+        localTrialData.milliseconds > 29.5 and
+        localTrialData.failedState == false and
+        localTrialData.successState == false
+    then
+        localTrialData.failedState = true
+        localTrialData.mistakeMessage = "Too slow!"
+        localTrialData.frameCounter = 0
+    end
+
+    if inputs[mnemonics.L2] and inputs[mnemonics.Up] and (emu.framecount() - commonVariables.lastResetFrame) > 60 then
+        return {}
+    end
+
+    if localTrialData.failedState then
+        trialFailedDisplay(localTrialData.mistakeMessage)
+        commonVariables.currentSuccesses = 0
+    end
+
+    if localTrialData.successState then
+        trialSuccessDisplay()
+        commonVariables.currentSuccesses = commonVariables.currentSuccesses + 1
+    end
+
+    if localTrialData.failedState and localTrialData.frameCounter > 160 then
+        return {}
+    end
+
+    if localTrialData.successState and localTrialData.frameCounter > 160 then
+        saveData[trials[commonVariables.currentTrial].trialName] = saveData[trials[commonVariables.currentTrial].trialName] + 1
+        updateForm(saveData, guiForm)
+        if settings.autoContinue and settings.consistencyTraining == false then
+            commonVariables.currentTrial = commonVariables.currentTrial + 1
+        elseif settings.autoContinue and settings.consistencyTraining and
+            commonVariables.currentSuccesses > 9 then
+            commonVariables.currentTrial = commonVariables.currentTrial + 1
+        end
+        return {}
+    end
+
+    customMessageDisplay(0, " Get Soul of Bat and reach Outer Wall")
+    return localTrialData
+end
+
 ------Richter------
 local function richterTrialSlidingAirslash(passedTrialData)
     local localTrialData = passedTrialData
@@ -2417,10 +2544,11 @@ trials[4].trialToRun = alucardTrialFloorClip
 trials[5].trialToRun = alucardTrialBookJump
 trials[6].trialToRun = alucardChallengeShieldDashSpeed
 trials[7].trialToRun = alucardChallengeForceOfEchoTimeTrial
-trials[8].trialToRun = richterTrialSlidingAirslash
-trials[9].trialToRun = richterTrialVaultingAirslash
-trials[10].trialToRun = richterTrialOtgAirslash
-trials[11].trialToRun = richterChallengeMinotaurRoomTimeTrial
+trials[8].trialToRun = alucardChallengeLibraryEscapeTimeTrial
+trials[9].trialToRun = richterTrialSlidingAirslash
+trials[10].trialToRun = richterTrialVaultingAirslash
+trials[11].trialToRun = richterTrialOtgAirslash
+trials[12].trialToRun = richterChallengeMinotaurRoomTimeTrial
 
 while true do
     --end script when the form is closed
