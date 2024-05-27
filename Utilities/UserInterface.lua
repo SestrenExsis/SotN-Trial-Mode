@@ -70,6 +70,13 @@ function initForm(commonVariables, saveData, guiForm, settings)
         end
     , 10, y, 200, 20)
     y = y + 22
+    guiForm.alucardChallengeLibraryEscapeTimeTrialButton = forms.button(guiForm.mainForm, "Library Escape time trial   cleared:"  .. saveData["alucardChallengeLibraryEscapeTimeTrial"],
+        function(x)
+            commonVariables.trialData = {}
+            commonVariables.currentTrial = 8
+        end
+    , 10, y, 200, 20)
+    y = y + 22
 
     -- Richter Trials
     forms.label(guiForm.mainForm, "Richter Trials:", 10, y, 220, 20)
@@ -122,6 +129,7 @@ function updateForm(saveData, guiForm)
     -- Alucard Challenges
     forms.settext(guiForm.alucardChallengeShieldDashSpeedButton,  "Shield Dashing average speed   cleared:" .. saveData["alucardChallengeShieldDashSpeed"])
     forms.settext(guiForm.alucardChallengeForceOfEchoTimeTrialButton,  "Force of Echo time trial   cleared:" .. saveData["alucardChallengeForceOfEchoTimeTrial"])
+    forms.settext(guiForm.alucardChallengeLibraryEscapeTimeTrialButton,  "Library Escape time trial   cleared:" .. saveData["alucardChallengeLibraryEscapeTimeTrial"])
     -- Richter Trials
     forms.settext(guiForm.richterTrialSlidingAirslashButton,  "Sliding Airslash   cleared:" .. saveData["richterTrialSlidingAirslash"])
     forms.settext(guiForm.richterTrialVaultingAirslashButton,  "Vaulting Airslash   cleared:" .. saveData["richterTrialVaultingAirslash"])

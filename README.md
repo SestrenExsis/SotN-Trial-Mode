@@ -1,37 +1,7 @@
 # SOTN Trial Mode
+Original version by TalicZealot, fork by SestrenExsis
+
 Trials and challenges for Castlevania: SotN through a LUA script for Bizhawk, intended to help runners with learning essential speedrunning tricks and test players with difficult and interesting challenges.
-
-## Version 0.9.7
-This fork of the original Trial Mode was made primarily so that it would work in newer versions of Bizhawk, such as 2.9.1. Other improvemens may be made as I think of them.
-
-### changelog
-
-#### 0.9.7
-* Add option to shuffle RNG
-
-#### 0.9.6
-* Add Book Jump trial
-
-#### 0.9.5
-* Added special case checks for Frontslide to improve accuracy
-* Added special case checks for Autodash to improve accuracy
-
-#### 0.9.4
-* Added ability to hard-code inputs for a demo
-* Added special case checks for Richter Skip to improve accuracy
-
-#### 0.9.3
-* Updated save states for Bizhawk version 2.9.1
-
-#### 0.9.2
-* Added beta pause buffering support
-* Added Richter Skip Wolf trial
-* Added Otg Airslash Trial
-* Changed Reset and Demo hotkeys
-* Lowered Shield Dashing challenge timer from 30 to 20 seconds
-
-#### 0.9.1
-* Beta release.
 
 ## Setup
 * Download repository from *Clone or download* > *Download ZIP*
