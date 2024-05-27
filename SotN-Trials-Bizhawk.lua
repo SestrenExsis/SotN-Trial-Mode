@@ -102,6 +102,7 @@ local constants = {
         roomMinotaurValue = 124,
         roomMinotaurEscapedValue = 100,
         niceRngSeed = 0x0978B8,
+        soulOfBatRelic = 0x097964,
     },
     buttonImages = {
         cross = "images/cross.png",
@@ -1912,6 +1913,7 @@ end
 -- ---------+-----------------+--------------------+----------
 -- X360     | 0:28            | 0:36               | 0:08
 -- PSX      | 0:36            | 0:48               | 0:12
+
 local function alucardChallengeLibraryEscapeTimeTrial(passedTrialData)
     local localTrialData = passedTrialData
     if localTrialData.moves == nil then
@@ -1935,7 +1937,10 @@ local function alucardChallengeLibraryEscapeTimeTrial(passedTrialData)
     end
 
     if localTrialData.start == false then
-        if mainmemory.readbyte(0x097964) > 0 or mainmemory.readbyte(0x03C9A4) == 2 then
+        -- TODO(sestren): Confirm if 0x03C9A4 is the memory location for menu state
+        if mainmemory.readbyte(constants.memoryData.soulOfBatRelic) > 0 or
+            mainmemory.readbyte(0x03C9A4) == 2
+        then
             localTrialData.counterOn = true
             localTrialData.start = true
         end
@@ -1959,8 +1964,8 @@ local function alucardChallengeLibraryEscapeTimeTrial(passedTrialData)
         customMessageDisplay(1, string.format("%2.3f", localTrialData.milliseconds))
     end
 
+    -- TODO(sestren): Confirm if 0x0974A0 is the memory location for area
     if localTrialData.start and
-        -- 
         mainmemory.readbyte(0x0974A0) == 1 and
         mainmemory.read_u16_le(constants.memoryData.characterXpos) < 128 and
         localTrialData.failedState == false and
@@ -1981,7 +1986,10 @@ local function alucardChallengeLibraryEscapeTimeTrial(passedTrialData)
         localTrialData.frameCounter = 0
     end
 
-    if inputs[mnemonics.L2] and inputs[mnemonics.Up] and (emu.framecount() - commonVariables.lastResetFrame) > 60 then
+    if inputs[mnemonics.L2] and
+        inputs[mnemonics.Up] and
+        (emu.framecount() - commonVariables.lastResetFrame) > 60
+    then
         return {}
     end
 
