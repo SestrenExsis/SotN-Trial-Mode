@@ -1907,6 +1907,11 @@ local function alucardChallengeForceOfEchoTimeTrial(passedTrialData)
     return localTrialData
 end
 
+-- Library Escape Par Times (these are purely estimates)
+-- Platform | with Floor Clip | without Floor Clip | Difference
+-- ---------+-----------------+--------------------+----------
+-- X360     | 0:28            | 0:36               | 0:08
+-- PSX      | 0:36            | 0:48               | 0:12
 local function alucardChallengeLibraryEscapeTimeTrial(passedTrialData)
     local localTrialData = passedTrialData
     if localTrialData.moves == nil then
@@ -1929,9 +1934,11 @@ local function alucardChallengeLibraryEscapeTimeTrial(passedTrialData)
         }
     end
 
-    if mainmemory.readbyte(constants.memoryData.currentRoom) ~= constants.memoryData.roomForceOfEchoValue and localTrialData.start == false then
-        localTrialData.counterOn = true
-        localTrialData.start = true
+    if localTrialData.start == false then
+        if mainmemory.readbyte(0x097964) > 0 or mainmemory.readbyte(0x03C9A4) == 2 then
+            localTrialData.counterOn = true
+            localTrialData.start = true
+        end
     end
 
     local inputs = joypad.get()
@@ -1952,28 +1959,10 @@ local function alucardChallengeLibraryEscapeTimeTrial(passedTrialData)
         customMessageDisplay(1, string.format("%2.3f", localTrialData.milliseconds))
     end
 
-    if mainmemory.readbyte(constants.memoryData.forceOfEcho) == 3 and
-        localTrialData.hasForceOfEcho == false
-    then
-        localTrialData.hasForceOfEcho = true
-        localTrialData.timeAtFOE = string.format("%2.3f", localTrialData.milliseconds)
-    end
-
-    if localTrialData.timeAtFOE ~= nil then
-        customMessageDisplay(2, "Force of Echo at: " .. localTrialData.timeAtFOE)
-    end
-
     if localTrialData.start and
-        mainmemory.readbyte(constants.memoryData.currentRoom) == constants.memoryData.roomForceOfEchoValue and
-        localTrialData.hasForceOfEcho == false and
-        localTrialData.failedState == false and
-        localTrialData.successState == false
-    then
-        localTrialData.failedState = true
-        localTrialData.frameCounter = 0
-    elseif localTrialData.start and
-        mainmemory.readbyte(constants.memoryData.currentRoom) == constants.memoryData.roomForceOfEchoValue and
-        localTrialData.hasForceOfEcho and
+        -- 
+        mainmemory.readbyte(0x0974A0) == 1 and
+        mainmemory.read_u16_le(constants.memoryData.characterXpos) < 128 and
         localTrialData.failedState == false and
         localTrialData.successState == false
     then
@@ -1982,8 +1971,8 @@ local function alucardChallengeLibraryEscapeTimeTrial(passedTrialData)
     end
 
     if localTrialData.start and
-        localTrialData.seconds > 28 and
-        localTrialData.milliseconds > 29.5 and
+        localTrialData.seconds >= 48 and
+        localTrialData.milliseconds > 0.0 and
         localTrialData.failedState == false and
         localTrialData.successState == false
     then
@@ -2022,7 +2011,7 @@ local function alucardChallengeLibraryEscapeTimeTrial(passedTrialData)
         return {}
     end
 
-    customMessageDisplay(0, " Get Soul of Bat and reach Outer Wall")
+    customMessageDisplay(0, " Get Soul of Bat and reach Outer Wall in under 48 seconds")
     return localTrialData
 end
 
