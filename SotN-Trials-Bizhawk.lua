@@ -195,6 +195,7 @@ local trials = {
 
 local commonVariables = {
     currentTrial = 1,
+    activeTrialName = "alucardTrialRichterSkip",
     currentSuccesses = 0,
     lastResetFrame = 0,
     trialData = {}

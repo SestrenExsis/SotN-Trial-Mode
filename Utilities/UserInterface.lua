@@ -21,6 +21,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 1
+            commonVariables.activeTrialName = "alucardTrialRichterSkip"
         end
     , 10, y, 200, 20)
     y = y + 22
@@ -28,6 +29,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 2
+            commonVariables.activeTrialName = "alucardTrialFrontslide"
         end
     , 10, y, 200, 20)
     y = y + 22
@@ -35,6 +37,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 3
+            commonVariables.activeTrialName = "alucardTrialAutodash"
         end
     , 10, y, 200, 20)
     y = y + 22
@@ -42,6 +45,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 4
+            commonVariables.activeTrialName = "alucardTrialFloorClip"
         end
     , 10, y, 200, 20)
     y = y + 22
@@ -49,6 +53,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 5
+            commonVariables.activeTrialName = "alucardTrialBookJump"
         end
     , 10, y, 200, 20)
     y = y + 22
@@ -60,6 +65,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 6
+            commonVariables.activeTrialName = "alucardChallengeShieldDashSpeed"
         end
     , 10, y, 200, 20)
     y = y + 22
@@ -67,6 +73,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 7
+            commonVariables.activeTrialName = "alucardChallengeForceOfEchoTimeTrial"
         end
     , 10, y, 200, 20)
     y = y + 22
@@ -74,6 +81,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 8
+            commonVariables.activeTrialName = "alucardChallengeLibraryEscapeTimeTrial"
         end
     , 10, y, 200, 20)
     y = y + 22
@@ -85,6 +93,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
         function(x)
             commonVariables.trialData.moves = nil
             commonVariables.currentTrial = 8
+            commonVariables.activeTrialName = "richterTrialSlidingAirslash"
         end
     , 10, y, 200, 20)
     y = y + 22
@@ -92,6 +101,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 9
+            commonVariables.activeTrialName = "richterTrialVaultingAirslash"
         end
     , 10, y, 200, 20)
     y = y + 22
@@ -99,6 +109,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
         function(x) --richterTrialOtgAirslash
             commonVariables.trialData = {}
             commonVariables.currentTrial = 10
+            commonVariables.activeTrialName = "richterTrialOtgAirslash"
         end
     , 10, y, 200, 20)
     y = y + 22
@@ -110,6 +121,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
         function(x)
             commonVariables.trialData = {}
             commonVariables.currentTrial = 11
+            commonVariables.activeTrialName = "richterChallengeMinotaurRoomTimeTrial"
         end
     , 10, y, 200, 20)
     y = y + 22
