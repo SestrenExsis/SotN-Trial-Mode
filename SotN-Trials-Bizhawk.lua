@@ -864,6 +864,7 @@ local function alucardTrialRichterSkip(passedTrialData)
                 }
             },
             demoInputs = {
+                { duration = 15, buttons = {  } },
                 { duration = 3, buttons = { mnemonics.Left } },
                 { duration = 3, buttons = {  } },
                 { duration = 1, buttons = { mnemonics.Left } },
