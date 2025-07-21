@@ -5,10 +5,9 @@ Trials and challenges for Castlevania: SotN through a LUA script for Bizhawk, in
 
 ## Setup
 * Download repository from *Clone or download* > *Download ZIP*
-* In Bizhawk set Config > Customize > Advanced > Lua Core > Lua+LuaInterface > Restart
 * Launch the script after running the game through Tools > Lua Console > Script > Open Script
 * Highly recommended to use Pixel Pro Mode for rendering. In Bizhawk PSX > Options > Pixel Pro Mode
-* This is how it should look like:
+* This is an example of what it will look like:
 ![Using PixelPro](https://i.imgur.com/nbSWYtf.png)
 
 ## TODO
