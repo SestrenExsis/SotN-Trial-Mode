@@ -352,7 +352,7 @@ local function verifyInputs(localTrialData, inputs)
                 localTrialData.mistakeMessage =
                     "Pressed " ..
                         localTrialData.moves[localTrialData.currentMove].description .. " "  .. localTrialData.frameCounter - localTrialData.moves[localTrialData.currentMove].frameWindow ..
-                        " frames too late!"
+                        " frames late!"
                     return
             elseif localTrialData.moves[localTrialData.currentMove].minimumGap ~= nil and  inputs[localTrialData.moves[localTrialData.currentMove].buttonsOr[i]] and
                 localTrialData.frameCounter < localTrialData.moves[localTrialData.currentMove].minimumGap then
@@ -360,7 +360,7 @@ local function verifyInputs(localTrialData, inputs)
                 localTrialData.mistakeMessage =
                     "Pressed " ..
                         localTrialData.moves[localTrialData.currentMove].description .. " "  .. localTrialData.moves[localTrialData.currentMove].minimumGap - localTrialData.frameCounter ..
-                        " frames too early!"
+                        " frames early!"
                     return
             else
                 inputCondition = inputCondition or inputs[localTrialData.moves[localTrialData.currentMove].buttonsOr[i]]
@@ -379,7 +379,7 @@ local function verifyInputs(localTrialData, inputs)
                 localTrialData.mistakeMessage =
                     "Pressed " ..
                     localTrialData.moves[localTrialData.currentMove].description .. " " .. localTrialData.frameCounter - localTrialData.moves[localTrialData.currentMove].frameWindow ..
-                    " frames too late!"
+                    " frames late!"
                 return
             elseif localTrialData.moves[localTrialData.currentMove].minimumGap ~= nil and
                 inputs[localTrialData.moves[localTrialData.currentMove].buttons[i]] and
@@ -389,7 +389,7 @@ local function verifyInputs(localTrialData, inputs)
                 localTrialData.mistakeMessage =
                     "Pressed " ..
                     localTrialData.moves[localTrialData.currentMove].description .. " "  .. localTrialData.moves[localTrialData.currentMove].minimumGap - localTrialData.frameCounter ..
-                    " frames too early!"
+                    " frames early!"
                 return
             else
                 inputCondition = inputCondition and inputs[localTrialData.moves[localTrialData.currentMove].buttons[i]]
@@ -410,7 +410,7 @@ local function verifyInputs(localTrialData, inputs)
                 localTrialData.mistakeMessage =
                     "Released " ..
                     localTrialData.moves[localTrialData.currentMove].buttonsHold[i] .. localTrialData.moves[localTrialData.currentMove].holdDuration - localTrialData.frameCounter ..
-                        " frames too early!"
+                        " frames early!"
                     return
             elseif localTrialData.moves[localTrialData.currentMove].holdDuration ~= nil and inputs[localTrialData.moves[localTrialData.currentMove].buttonsHold[i]] and
                 localTrialData.frameCounter < localTrialData.moves[localTrialData.currentMove].holdDuration then
@@ -1342,7 +1342,7 @@ local function alucardTrialFloorClip(passedTrialData)
                     failButtons = {
                         {
                             button = mnemonics.Wolf,
-                            failMessage = "Transformed to Wolf too early!"
+                            failMessage = "Transformed to Wolf early!"
                         },
                         {
                             button = mnemonics.Right,
@@ -1357,7 +1357,7 @@ local function alucardTrialFloorClip(passedTrialData)
                 }, {
                     images = {constants.buttonImages.r2},
                     text = "5-6 frame gap",
-                    description = "wolf(after 5 or 6 frames)",
+                    description = "wolf",
                     completed = false,
                     buttons = {mnemonics.Wolf},
                     buttonsHold = {mnemonics.Left},
@@ -1373,7 +1373,7 @@ local function alucardTrialFloorClip(passedTrialData)
                     },
                     counter = true,
                     frameWindow = 7,
-                    minimumGap = 6
+                    minimumGap = 5
                 }, {
                     images = {constants.buttonImages.cross},
                     description = "jump",
