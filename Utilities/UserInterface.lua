@@ -92,7 +92,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
     guiForm.richterTrialSlidingAirslashButton = forms.button(guiForm.mainForm, "Sliding Airslash   cleared:" .. saveData["richterTrialSlidingAirslash"],
         function(x)
             commonVariables.trialData.moves = nil
-            commonVariables.currentTrial = 8
+            commonVariables.currentTrial = 9
             commonVariables.activeTrialName = "richterTrialSlidingAirslash"
         end
     , 10, y, 200, 20)
@@ -100,7 +100,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
     guiForm.richterTrialVaultingAirslashButton = forms.button(guiForm.mainForm, "Vaulting Airslash   cleared:" .. saveData["richterTrialVaultingAirslash"],
         function(x)
             commonVariables.trialData = {}
-            commonVariables.currentTrial = 9
+            commonVariables.currentTrial = 10
             commonVariables.activeTrialName = "richterTrialVaultingAirslash"
         end
     , 10, y, 200, 20)
@@ -108,7 +108,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
     guiForm.richterTrialOtgAirslashButton = forms.button(guiForm.mainForm, "Otg Airslash   cleared:" .. saveData["richterTrialOtgAirslash"],
         function(x) --richterTrialOtgAirslash
             commonVariables.trialData = {}
-            commonVariables.currentTrial = 10
+            commonVariables.currentTrial = 11
             commonVariables.activeTrialName = "richterTrialOtgAirslash"
         end
     , 10, y, 200, 20)
@@ -120,7 +120,7 @@ function initForm(commonVariables, saveData, guiForm, settings)
     guiForm.richterChallengeMinotaurRoomTimeTrialButton = forms.button(guiForm.mainForm, "Minotaur Room   cleared:"  .. saveData["richterChallengeMinotaurRoomTimeTrial"],
         function(x)
             commonVariables.trialData = {}
-            commonVariables.currentTrial = 11
+            commonVariables.currentTrial = 12
             commonVariables.activeTrialName = "richterChallengeMinotaurRoomTimeTrial"
         end
     , 10, y, 200, 20)

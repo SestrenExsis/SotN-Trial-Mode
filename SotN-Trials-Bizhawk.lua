@@ -745,7 +745,7 @@ local function alucardTrialRichterSkip(passedTrialData)
             currentMove = 2,
             --table of the trial steps called moves, with condition check properties like buttons to be pressed, held down, etc.
             moves = {
-                {text = "Autodash:", completed = true},
+                {text = "Richter Skip:", completed = true},
                 {
                     description = "Left",
                     images = {constants.buttonImages.left},
