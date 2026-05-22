@@ -15,11 +15,17 @@ local function getVersion()
     -- TODO(sestren): Remove patch version in a more sensible way
     if version == "2.9.1" then
         version = "2.9"
+    elseif version == "2.11.1" then
+        version = "2.11"
     end
     return version
 end
 
 if getVersion() == "2.9" then
+    require "Utilities/Math29"
+elseif getVersion() == "2.10" then
+    require "Utilities/Math29"
+elseif getVersion() == "2.11" then
     require "Utilities/Math29"
 else
     require "Utilities/MathLegacy"
